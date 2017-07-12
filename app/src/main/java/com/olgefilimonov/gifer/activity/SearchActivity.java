@@ -92,12 +92,13 @@ public class SearchActivity extends AppCompatActivity {
             for (Datum datum : response.body().getData()) {
               String previewUrl = datum.getImages().getDownsized().getUrl();
               String videoUrl = datum.getImages().getOriginalMp4().getMp4();
-              Gif gif = new Gif(videoUrl, previewUrl);
+              Gif gif = new Gif(datum.getId(), videoUrl, previewUrl);
               newGifs.add(gif);
             }
 
             gifs.addAll(newGifs);
             adapter.notifyDataSetChanged();
+            adapter.updateGifRating();
             floatingSearchView.hideProgress();
           }
 
