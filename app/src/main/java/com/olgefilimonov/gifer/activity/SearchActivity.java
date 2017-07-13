@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.arlib.floatingsearchview.FloatingSearchView;
@@ -32,7 +31,6 @@ import retrofit2.Response;
 public class SearchActivity extends AppCompatActivity {
   /* UI */
   @BindView(R.id.floating_search_view) FloatingSearchView floatingSearchView;
-  @BindView(R.id.empty_textview) TextView emptyTextView;
   @BindView(R.id.recycler_view) RecyclerView searchResultsRecyclerView;
   /* API */
   private List<Gif> gifs = new ArrayList<>();
