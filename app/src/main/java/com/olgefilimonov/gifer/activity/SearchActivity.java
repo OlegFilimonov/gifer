@@ -1,11 +1,15 @@
 package com.olgefilimonov.gifer.activity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.arlib.floatingsearchview.FloatingSearchView;
@@ -31,6 +35,7 @@ import retrofit2.Response;
 public class SearchActivity extends AppCompatActivity {
   /* UI */
   @BindView(R.id.floating_search_view) FloatingSearchView floatingSearchView;
+  @BindView(R.id.empty_text_view) TextView emptyTextView;
   @BindView(R.id.recycler_view) RecyclerView searchResultsRecyclerView;
   /* API */
   private List<Gif> gifs = new ArrayList<>();
@@ -61,7 +66,15 @@ public class SearchActivity extends AppCompatActivity {
     searchResultsRecyclerView.setLayoutManager(layoutManager);
     searchResultsRecyclerView.setAdapter(adapter);
     searchResultsRecyclerView.addOnScrollListener(endlessListener);
+    searchResultsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+      @Override public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        super.onScrollStateChanged(recyclerView, newState);
 
+        // Hide keyboard
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
+      }
+    });
     // Setup API
     floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
       @Override public void onSearchTextChanged(String oldQuery, String newQuery) {
@@ -72,8 +85,8 @@ public class SearchActivity extends AppCompatActivity {
 
         // Clear gifs and let endless endlessListener do it's job
         skip = 0;
+        adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
         gifs.clear();
-        adapter.notifyDataSetChanged();
         endlessListener.reset();
 
         loadNextDataFromApi(1);
@@ -82,7 +95,7 @@ public class SearchActivity extends AppCompatActivity {
 
     loadNextDataRunnable = new SkipLimitRunnable(skip, Constant.SEARCH_LIMIT) {
       @Override public void run() {
-        api.searchGifs(Constant.GIPHER_API_KEY, query, limit, skip).enqueue(new Callback<GiphyResponse>() {
+        api.searchGifs(Constant.GIPHER_API_KEY, query, this.limit, this.skip).enqueue(new Callback<GiphyResponse>() {
           @Override public void onResponse(Call<GiphyResponse> call, Response<GiphyResponse> response) {
             List<Gif> newGifs = new ArrayList<Gif>();
 
@@ -95,8 +108,10 @@ public class SearchActivity extends AppCompatActivity {
             }
 
             gifs.addAll(newGifs);
-            adapter.notifyDataSetChanged();
+            adapter.notifyItemRangeInserted(adapter.getItemCount() - 1, newGifs.size());
+
             adapter.updateGifRating();
+            emptyTextView.setVisibility(adapter == null || adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
             floatingSearchView.hideProgress();
           }
 
@@ -111,12 +126,14 @@ public class SearchActivity extends AppCompatActivity {
   @Override protected void onResume() {
     super.onResume();
     if (adapter != null) adapter.updateGifRating();
+    emptyTextView.setVisibility(adapter == null || adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
   }
 
   private void loadNextDataFromApi(int current_page) {
     if (Constant.DEBUG) Log.d("Listener", "onLoadMore: " + current_page);
     skip = (current_page - 1) * Constant.SEARCH_LIMIT;
     handler.removeCallbacks(loadNextDataRunnable);
+    loadNextDataRunnable.setSkip(skip);
     handler.post(loadNextDataRunnable);
   }
 }

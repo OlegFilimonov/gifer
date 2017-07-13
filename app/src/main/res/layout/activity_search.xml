@@ -20,6 +20,20 @@
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/floating_search_view"
       />
+
+  <TextView
+      android:id="@+id/empty_text_view"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      android:text="Hi. Try searching for something. \n It's kinda the only thing this app can do."
+      android:textColor="@android:color/white"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      />
+
   <com.arlib.floatingsearchview.FloatingSearchView
       android:id="@+id/floating_search_view"
       android:layout_width="0dp"
