@@ -20,6 +20,7 @@ import com.olgefilimonov.gifer.singleton.GiferApplication;
 import io.objectbox.Box;
 import java.util.List;
 
+import static com.olgefilimonov.gifer.activity.GifDetailActivity.GIF_ID_EXTRA;
 import static com.olgefilimonov.gifer.activity.GifDetailActivity.URL_EXTRA;
 
 /**
@@ -39,13 +40,15 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
 
   public void updateGifRating() {
 
-    for (Gif gif : gifs) {
+    for (int i = 0; i < gifs.size(); i++) {
+      Gif gif = gifs.get(i);
       List<RatedGif> ratedGifList = gifsBox.find("gifId", gif.getGifId());
       if (ratedGifList.size() == 0) {
-        // No rating found
+        // No rating found -- don't do anything
       } else if (ratedGifList.size() == 1) {
         // Rating found
         gif.setScore(ratedGifList.get(0).getScore());
+        notifyItemChanged(i);
       } else {
         throw new RuntimeException("Database error. gifId must be unique");
       }
@@ -67,33 +70,19 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
       @Override public void onClick(View view) {
         Intent intent = new Intent(context, GifDetailActivity.class);
         intent.putExtra(URL_EXTRA, gif.getVideoUrl());
+        intent.putExtra(GIF_ID_EXTRA, gif.getGifId());
         context.startActivity(intent);
       }
     });
     holder.score.setText(String.valueOf(gif.getScore()));
+    // Likes & Dislike click
     holder.like.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
 
         gif.setScore(gif.getScore() + 1);
-
-        List<RatedGif> ratedGifList = gifsBox.find("gifId", gif.getGifId());
-        RatedGif ratedGif = null;
-
-        if (ratedGifList.size() == 0) {
-          // No rating found
-          ratedGif = new RatedGif();
-          ratedGif.setGifId(gif.getGifId());
-        } else if (ratedGifList.size() == 1) {
-          // Rating found
-          ratedGif = ratedGifList.get(0);
-        } else {
-          throw new RuntimeException("Database error. gifId must be unique");
-        }
-
+        RatedGif ratedGif = getRatedGif(gif.getGifId());
         ratedGif.setScore(gif.getScore());
-
         notifyItemChanged(holder.getAdapterPosition());
-
         gifsBox.put(ratedGif);
       }
     });
@@ -102,42 +91,48 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
       @Override public void onClick(View view) {
 
         gif.setScore(gif.getScore() - 1);
-
-        List<RatedGif> ratedGifList = gifsBox.find("gifId", gif.getGifId());
-        RatedGif ratedGif = null;
-
-        if (ratedGifList.size() == 0) {
-          // No rating found
-          ratedGif = new RatedGif();
-          ratedGif.setGifId(gif.getGifId());
-        } else if (ratedGifList.size() == 1) {
-          // Rating found
-          ratedGif = ratedGifList.get(0);
-        } else {
-          throw new RuntimeException("Database error. gifId must be unique");
-        }
-
+        RatedGif ratedGif = getRatedGif(gif.getGifId());
         ratedGif.setScore(gif.getScore());
-
         notifyItemChanged(holder.getAdapterPosition());
-
         gifsBox.put(ratedGif);
       }
     });
+  }
+
+  /**
+   * Helper method for getting rated gifs from the db
+   *
+   * @param gifId id of the gif from giphy
+   * @return a rated gif object from the database if it exists
+   */
+  private RatedGif getRatedGif(String gifId) {
+    RatedGif ratedGif;
+    List<RatedGif> ratedGifList = gifsBox.find("gifId", gifId);
+    if (ratedGifList.size() == 0) {
+      // No rating found
+      ratedGif = new RatedGif();
+      ratedGif.setGifId(gifId);
+    } else if (ratedGifList.size() == 1) {
+      // Rating found
+      ratedGif = ratedGifList.get(0);
+    } else {
+      throw new RuntimeException("Database error. gifId must be unique");
+    }
+    return ratedGif;
   }
 
   @Override public int getItemCount() {
     return gifs.size();
   }
 
-  public class SearchResultViewHolder extends RecyclerView.ViewHolder {
+  class SearchResultViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.gif_card) CardView card;
     @BindView(R.id.gif_image) ImageView image;
     @BindView(R.id.gif_like) ImageView like;
     @BindView(R.id.gif_dislike) ImageView dislike;
     @BindView(R.id.gif_score) TextView score;
 
-    public SearchResultViewHolder(View itemView) {
+    SearchResultViewHolder(View itemView) {
       super(itemView);
       ButterKnife.bind(this, itemView);
     }

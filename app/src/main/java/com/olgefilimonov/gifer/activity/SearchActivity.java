@@ -110,6 +110,11 @@ public class SearchActivity extends AppCompatActivity {
     };
   }
 
+  @Override protected void onResume() {
+    super.onResume();
+    if (adapter != null) adapter.updateGifRating();
+  }
+
   private void loadNextDataFromApi(int current_page) {
     if (Constant.DEBUG) Log.d("Listener", "onLoadMore: " + current_page);
     skip = (current_page - 1) * Constant.SEARCH_LIMIT;
