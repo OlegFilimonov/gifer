@@ -24,4 +24,7 @@ public class Constant {
    * The minimum amount of items to have BELOW your current scroll position before loading more.
    */
   public static final int VISIBLE_TRESHHOLD = 5;
+
+  /* JOBS */
+  public static final int DEFAULT_PRIORITY = 0;
 }

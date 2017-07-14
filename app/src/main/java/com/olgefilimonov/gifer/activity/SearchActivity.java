@@ -33,11 +33,9 @@ import retrofit2.Response;
  * @author Oleg Filimonov
  */
 public class SearchActivity extends AppCompatActivity {
-  /* UI */
   @BindView(R.id.floating_search_view) FloatingSearchView floatingSearchView;
   @BindView(R.id.empty_text_view) TextView emptyTextView;
   @BindView(R.id.recycler_view) RecyclerView searchResultsRecyclerView;
-  /* API */
   private List<Gif> gifs = new ArrayList<>();
   private String query;
   private int skip = 0;
