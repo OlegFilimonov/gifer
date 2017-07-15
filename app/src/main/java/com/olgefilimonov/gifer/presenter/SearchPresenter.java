@@ -8,6 +8,7 @@ import com.olgefilimonov.gifer.model.RatedGif;
 import com.olgefilimonov.gifer.mvp.UseCase;
 import com.olgefilimonov.gifer.singleton.Constant;
 import com.olgefilimonov.gifer.singleton.GiferApplication;
+import com.olgefilimonov.gifer.usecase.CheckGifRatingJob;
 import com.olgefilimonov.gifer.usecase.LoadGifsJob;
 import com.olgefilimonov.gifer.usecase.RateGifJob;
 import io.objectbox.BoxStore;
@@ -57,20 +58,31 @@ public class SearchPresenter implements SearchContract.Presenter {
     jobManager.addJobInBackground(job);
   }
 
-  @Override public void updateGifRating(Gif gif) {
+  @Override public void updateGifRating(String gifId) {
+    CheckGifRatingJob.RequestValues requestValues = new CheckGifRatingJob.RequestValues(gifId);
+    jobManager.addJobInBackground(new CheckGifRatingJob(requestValues, tag, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
+      @Override public void onSuccess(CheckGifRatingJob.ResponseValues response) {
+        view.updateGifRating(response.getGifId(), response.getNewRating());
+      }
 
+      @Override public void onError() {
+        view.showError();
+      }
+    }));
   }
 
   @Override public void rateGif(Gif gif, int rating) {
-    jobManager.addJobInBackground(
-        new RateGifJob(new RateGifJob.RequestValues(gif, rating), tag, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<RateGifJob.ResponseValues>() {
-          @Override public void onSuccess(RateGifJob.ResponseValues response) {
-            view.updateGifRating(response.getGifId(), response.getNewRating());
-          }
+    RateGifJob.RequestValues requestValues = new RateGifJob.RequestValues(gif, rating);
+    UseCase.UseCaseCallback<RateGifJob.ResponseValues> useCaseCallback = new UseCase.UseCaseCallback<RateGifJob.ResponseValues>() {
+      @Override public void onSuccess(RateGifJob.ResponseValues response) {
+        view.updateGifRating(response.getGifId(), response.getNewRating());
+      }
 
-          @Override public void onError() {
-            view.showError();
-          }
-        }));
+      @Override public void onError() {
+        view.showError();
+      }
+    };
+    RateGifJob job = new RateGifJob(requestValues, tag, boxStore.boxFor(RatedGif.class), useCaseCallback);
+    jobManager.addJobInBackground(job);
   }
 }

@@ -18,8 +18,9 @@ public class SearchContract {
     /**
      * Updates the rating from repo on one gif only
      * Should be executed when user rates the gif from somewhere else then the search page
+     * @param gif
      */
-    void updateGifRating(Gif gif);
+    void updateGifRating(String gif);
 
     /**
      * Changes user's rating of the gif. Can be executed multiple times by the same user

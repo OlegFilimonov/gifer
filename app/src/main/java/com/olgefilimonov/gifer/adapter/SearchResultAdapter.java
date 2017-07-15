@@ -1,6 +1,6 @@
 package com.olgefilimonov.gifer.adapter;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +22,7 @@ import java.util.List;
 
 import static com.olgefilimonov.gifer.activity.GifDetailActivity.GIF_ID_EXTRA;
 import static com.olgefilimonov.gifer.activity.GifDetailActivity.URL_EXTRA;
+import static com.olgefilimonov.gifer.activity.SearchActivity.REQUEST_GIF_DETAIL;
 
 /**
  * @author Oleg Filimonov
@@ -30,12 +31,12 @@ import static com.olgefilimonov.gifer.activity.GifDetailActivity.URL_EXTRA;
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder> {
   private final Box<RatedGif> gifsBox;
   private List<Gif> gifs;
-  private Context context;
+  private Activity activity;
   private RateListener rateListener;
 
-  public SearchResultAdapter(List<Gif> gifs, Context context, RateListener rateListener) {
+  public SearchResultAdapter(List<Gif> gifs, Activity activity, RateListener rateListener) {
     this.gifs = gifs;
-    this.context = context;
+    this.activity = activity;
     this.rateListener = rateListener;
     this.gifsBox = GiferApplication.getInstance().getBoxStore().boxFor(RatedGif.class);
   }
@@ -60,14 +61,14 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     final Gif gif = gifs.get(position);
 
     // Load preview image
-    Glide.with(context).load(gif.getPreviewUrl()).into(holder.image);
+    Glide.with(activity).load(gif.getPreviewUrl()).into(holder.image);
     // Setup click
     holder.card.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-        Intent intent = new Intent(context, GifDetailActivity.class);
+        Intent intent = new Intent(activity, GifDetailActivity.class);
         intent.putExtra(URL_EXTRA, gif.getVideoUrl());
         intent.putExtra(GIF_ID_EXTRA, gif.getGifId());
-        context.startActivity(intent);
+        activity.startActivityForResult(intent, REQUEST_GIF_DETAIL);
       }
     });
     holder.score.setText(String.valueOf(gif.getScore()));

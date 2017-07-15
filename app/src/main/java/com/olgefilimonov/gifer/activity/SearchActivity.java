@@ -24,10 +24,13 @@ import com.olgefilimonov.gifer.singleton.Constant;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.olgefilimonov.gifer.activity.GifDetailActivity.GIF_ID_EXTRA;
+
 /**
  * @author Oleg Filimonov
  */
 public class SearchActivity extends AppCompatActivity implements SearchContract.View {
+  public static final int REQUEST_GIF_DETAIL = 974;
   @BindView(R.id.floating_search_view) FloatingSearchView floatingSearchView;
   @BindView(R.id.empty_text_view) TextView emptyTextView;
   @BindView(R.id.recycler_view) RecyclerView searchResultsRecyclerView;
@@ -91,6 +94,11 @@ public class SearchActivity extends AppCompatActivity implements SearchContract.
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == REQUEST_GIF_DETAIL && resultCode == RESULT_OK) {
+      // Update opened gif's rating
+      String gifId = data.getStringExtra(GIF_ID_EXTRA);
+      presenter.updateGifRating(gifId);
+    }
   }
 
   /**
