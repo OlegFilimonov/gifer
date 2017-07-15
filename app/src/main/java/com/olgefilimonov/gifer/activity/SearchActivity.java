@@ -125,7 +125,7 @@ public class SearchActivity extends AppCompatActivity implements SearchContract.
     emptyTextView.setVisibility(adapter == null || adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
   }
 
-  @Override public void updateGifRating(final String gifId, final int newRating) {
+  @Override public void showGifRating(final String gifId, final int newRating) {
     adapter.updateGifRating(gifId, newRating);
   }
 

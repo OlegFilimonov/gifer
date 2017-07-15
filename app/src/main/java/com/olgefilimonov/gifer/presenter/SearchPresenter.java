@@ -62,7 +62,7 @@ public class SearchPresenter implements SearchContract.Presenter {
     CheckGifRatingJob.RequestValues requestValues = new CheckGifRatingJob.RequestValues(gifId);
     jobManager.addJobInBackground(new CheckGifRatingJob(requestValues, tag, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
       @Override public void onSuccess(CheckGifRatingJob.ResponseValues response) {
-        view.updateGifRating(response.getGifId(), response.getNewRating());
+        view.showGifRating(response.getGifId(), response.getNewRating());
       }
 
       @Override public void onError() {
@@ -75,7 +75,7 @@ public class SearchPresenter implements SearchContract.Presenter {
     RateGifJob.RequestValues requestValues = new RateGifJob.RequestValues(gif, rating);
     UseCase.UseCaseCallback<RateGifJob.ResponseValues> useCaseCallback = new UseCase.UseCaseCallback<RateGifJob.ResponseValues>() {
       @Override public void onSuccess(RateGifJob.ResponseValues response) {
-        view.updateGifRating(response.getGifId(), response.getNewRating());
+        view.showGifRating(response.getGifId(), response.getNewRating());
       }
 
       @Override public void onError() {

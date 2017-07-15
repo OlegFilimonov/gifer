@@ -3,21 +3,15 @@ package com.olgefilimonov.gifer.contract;
 import com.olgefilimonov.gifer.model.Gif;
 import com.olgefilimonov.gifer.mvp.BasePresenter;
 import com.olgefilimonov.gifer.mvp.BaseView;
-import java.util.List;
 
 /**
  * @author Oleg Filimonov
  */
 
-public class SearchContract {
-
+public class GifDetailContract {
   public interface Presenter extends BasePresenter {
-
-    void loadGifs(String query, int page, int limit);
-
     /**
      * Updates the rating from repo on one gif only
-     * Should be executed when user rates the gif from somewhere else then the search page
      */
     void updateGifRating(String gifId);
 
@@ -31,28 +25,11 @@ public class SearchContract {
   }
 
   public interface View extends BaseView<Presenter> {
-
-    void clearSearchResults();
-
     /**
-     * Adds search results to the bottom of the list
+     * Updates rating the opened gif
      *
-     * @param gifs search results to add
-     */
-    void showSearchResults(List<Gif> gifs);
-
-    /**
-     * Updates rating of the search result in the list, if present
-     *
-     * @param gifId id of the gif to set new rating
      * @param newRating new rating to set
      */
-    void showGifRating(String gifId, int newRating);
-
-    void showProgress();
-
-    void showError();
-
-    void hideProgress();
+    void showGifRating(int newRating);
   }
 }
