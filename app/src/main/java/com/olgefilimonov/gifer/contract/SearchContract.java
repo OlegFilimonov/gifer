@@ -18,7 +18,6 @@ public class SearchContract {
     /**
      * Updates the rating from repo on one gif only
      * Should be executed when user rates the gif from somewhere else then the search page
-     * @param gif
      */
     void updateGifRating(String gif);
 
@@ -35,8 +34,19 @@ public class SearchContract {
 
     void clearSearchResults();
 
+    /**
+     * Adds search results to the bottom of the list
+     *
+     * @param gifs search results to add
+     */
     void showSearchResults(List<Gif> gifs);
 
+    /**
+     * Updates rating of the search result in the list, if present
+     *
+     * @param gifId id of the gif to set new rating
+     * @param newRating new rating to set
+     */
     void updateGifRating(String gifId, int newRating);
 
     void showProgress();
