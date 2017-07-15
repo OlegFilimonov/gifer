@@ -31,26 +31,22 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
   private final Box<RatedGif> gifsBox;
   private List<Gif> gifs;
   private Context context;
+  private RateListener rateListener;
 
-  public SearchResultAdapter(List<Gif> gifs, Context context) {
+  public SearchResultAdapter(List<Gif> gifs, Context context, RateListener rateListener) {
     this.gifs = gifs;
     this.context = context;
-    gifsBox = GiferApplication.getInstance().getBoxStore().boxFor(RatedGif.class);
+    this.rateListener = rateListener;
+    this.gifsBox = GiferApplication.getInstance().getBoxStore().boxFor(RatedGif.class);
   }
 
-  public void updateGifRating() {
-
+  public void updateGifRating(String gifId, int newRating) {
     for (int i = 0; i < gifs.size(); i++) {
       Gif gif = gifs.get(i);
-      List<RatedGif> ratedGifList = gifsBox.find("gifId", gif.getGifId());
-      if (ratedGifList.size() == 0) {
-        // No rating found -- don't do anything
-      } else if (ratedGifList.size() == 1) {
-        // Rating found
-        gif.setScore(ratedGifList.get(0).getScore());
+      if (gif.getGifId().equals(gifId)) {
+        gif.setScore(newRating);
         notifyItemChanged(i);
-      } else {
-        throw new RuntimeException("Database error. gifId must be unique");
+        return;
       }
     }
   }
@@ -78,51 +74,23 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     // Likes & Dislike click
     holder.like.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-
-        gif.setScore(gif.getScore() + 1);
-        RatedGif ratedGif = getRatedGif(gif.getGifId());
-        ratedGif.setScore(gif.getScore());
-        notifyItemChanged(holder.getAdapterPosition());
-        gifsBox.put(ratedGif);
+        rateListener.onVote(gif, 1);
       }
     });
 
     holder.dislike.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-
-        gif.setScore(gif.getScore() - 1);
-        RatedGif ratedGif = getRatedGif(gif.getGifId());
-        ratedGif.setScore(gif.getScore());
-        notifyItemChanged(holder.getAdapterPosition());
-        gifsBox.put(ratedGif);
+        rateListener.onVote(gif, -1);
       }
     });
   }
 
-  /**
-   * Helper method for getting rated gifs from the db
-   *
-   * @param gifId id of the gif from giphy
-   * @return a rated gif object from the database if it exists
-   */
-  private RatedGif getRatedGif(String gifId) {
-    RatedGif ratedGif;
-    List<RatedGif> ratedGifList = gifsBox.find("gifId", gifId);
-    if (ratedGifList.size() == 0) {
-      // No rating found
-      ratedGif = new RatedGif();
-      ratedGif.setGifId(gifId);
-    } else if (ratedGifList.size() == 1) {
-      // Rating found
-      ratedGif = ratedGifList.get(0);
-    } else {
-      throw new RuntimeException("Database error. gifId must be unique");
-    }
-    return ratedGif;
-  }
-
   @Override public int getItemCount() {
     return gifs.size();
+  }
+
+  public interface RateListener {
+    void onVote(Gif gif, int rating);
   }
 
   class SearchResultViewHolder extends RecyclerView.ViewHolder {

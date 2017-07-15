@@ -19,7 +19,6 @@ public class Datum {
   @SerializedName("user") @Expose private User user;
   @SerializedName("source_tld") @Expose private String sourceTld;
   @SerializedName("source_post_url") @Expose private String sourcePostUrl;
-  @SerializedName("is_indexable") @Expose private Integer isIndexable;
   @SerializedName("import_datetime") @Expose private String importDatetime;
   @SerializedName("trending_datetime") @Expose private String trendingDatetime;
   @SerializedName("images") @Expose private Images images;
@@ -134,14 +133,6 @@ public class Datum {
 
   public void setSourcePostUrl(String sourcePostUrl) {
     this.sourcePostUrl = sourcePostUrl;
-  }
-
-  public Integer getIsIndexable() {
-    return isIndexable;
-  }
-
-  public void setIsIndexable(Integer isIndexable) {
-    this.isIndexable = isIndexable;
   }
 
   public String getImportDatetime() {

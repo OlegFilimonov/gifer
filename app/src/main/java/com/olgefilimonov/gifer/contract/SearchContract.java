@@ -15,7 +15,19 @@ public class SearchContract {
 
     void loadGifs(String query, int page, int limit);
 
-    void updateGifRating();
+    /**
+     * Updates the rating from repo on one gif only
+     * Should be executed when user rates the gif from somewhere else then the search page
+     */
+    void updateGifRating(Gif gif);
+
+    /**
+     * Changes user's rating of the gif. Can be executed multiple times by the same user
+     *
+     * @param gif gif to rate
+     * @param rating can be -1 (downvote) or 1 (upvote)
+     */
+    void rateGif(Gif gif, int rating);
   }
 
   public interface View extends BaseView<Presenter> {
@@ -24,12 +36,12 @@ public class SearchContract {
 
     void showSearchResults(List<Gif> gifs);
 
+    void updateGifRating(String gifId, int newRating);
+
     void showProgress();
 
     void hideProgress();
 
-    void showEmptyText();
-
-    void hideEmptyText();
+    void showError();
   }
 }

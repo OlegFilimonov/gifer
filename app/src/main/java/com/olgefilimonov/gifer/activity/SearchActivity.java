@@ -1,8 +1,8 @@
 package com.olgefilimonov.gifer.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,49 +10,41 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.olgefilimonov.gifer.R;
 import com.olgefilimonov.gifer.adapter.SearchResultAdapter;
-import com.olgefilimonov.gifer.adapter.SkipLimitRunnable;
-import com.olgefilimonov.gifer.client.ApiClient;
-import com.olgefilimonov.gifer.client.DefaultApi;
+import com.olgefilimonov.gifer.contract.SearchContract;
 import com.olgefilimonov.gifer.listener.EndlessRecyclerGridOnScrollListener;
-import com.olgefilimonov.gifer.model.Datum;
 import com.olgefilimonov.gifer.model.Gif;
-import com.olgefilimonov.gifer.model.GiphyResponse;
+import com.olgefilimonov.gifer.presenter.SearchPresenter;
 import com.olgefilimonov.gifer.singleton.Constant;
 import java.util.ArrayList;
 import java.util.List;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * @author Oleg Filimonov
  */
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements SearchContract.View {
   @BindView(R.id.floating_search_view) FloatingSearchView floatingSearchView;
   @BindView(R.id.empty_text_view) TextView emptyTextView;
   @BindView(R.id.recycler_view) RecyclerView searchResultsRecyclerView;
   private List<Gif> gifs = new ArrayList<>();
   private String query;
   private int skip = 0;
-  private DefaultApi api;
   private SearchResultAdapter adapter;
-  private SkipLimitRunnable loadNextDataRunnable;
-  private Handler handler = new Handler();
   private EndlessRecyclerGridOnScrollListener endlessListener;
+
+  private SearchContract.Presenter presenter;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_search);
     ButterKnife.bind(this);
 
-    // Setup dependencies
-    api = new ApiClient().createService(DefaultApi.class);
-
+    new SearchPresenter(this);
     // Setup recyclerView
     GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
     endlessListener = new EndlessRecyclerGridOnScrollListener(layoutManager) {
@@ -60,7 +52,11 @@ public class SearchActivity extends AppCompatActivity {
         loadNextDataFromApi(current_page);
       }
     };
-    adapter = new SearchResultAdapter(gifs, this);
+    adapter = new SearchResultAdapter(gifs, this, new SearchResultAdapter.RateListener() {
+      @Override public void onVote(Gif gif, int rating) {
+        presenter.rateGif(gif, rating);
+      }
+    });
     searchResultsRecyclerView.setLayoutManager(layoutManager);
     searchResultsRecyclerView.setAdapter(adapter);
     searchResultsRecyclerView.addOnScrollListener(endlessListener);
@@ -76,62 +72,55 @@ public class SearchActivity extends AppCompatActivity {
     // Setup API
     floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
       @Override public void onSearchTextChanged(String oldQuery, String newQuery) {
+        clearSearchResults();
         // Save query for the endless endlessListener
         query = newQuery;
-        // Show progress icon in the search view
-        floatingSearchView.showProgress();
-
-        // Clear gifs and let endless endlessListener do it's job
-        skip = 0;
-        adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
-        gifs.clear();
-        endlessListener.reset();
-
-        loadNextDataFromApi(1);
+        presenter.loadGifs(query, skip, Constant.SEARCH_LIMIT);
       }
     });
-
-    loadNextDataRunnable = new SkipLimitRunnable(skip, Constant.SEARCH_LIMIT) {
-      @Override public void run() {
-        api.searchGifs(Constant.GIPHER_API_KEY, query, this.limit, this.skip).enqueue(new Callback<GiphyResponse>() {
-          @Override public void onResponse(Call<GiphyResponse> call, Response<GiphyResponse> response) {
-            List<Gif> newGifs = new ArrayList<Gif>();
-
-            // Convert gifs to the local model
-            for (Datum datum : response.body().getData()) {
-              String previewUrl = datum.getImages().getDownsized().getUrl();
-              String videoUrl = datum.getImages().getOriginalMp4().getMp4();
-              Gif gif = new Gif(datum.getId(), videoUrl, previewUrl);
-              newGifs.add(gif);
-            }
-
-            gifs.addAll(newGifs);
-            adapter.notifyItemRangeInserted(adapter.getItemCount() - 1, newGifs.size());
-
-            adapter.updateGifRating();
-            emptyTextView.setVisibility(adapter == null || adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
-            floatingSearchView.hideProgress();
-          }
-
-          @Override public void onFailure(Call<GiphyResponse> call, Throwable t) {
-
-          }
-        });
-      }
-    };
   }
 
-  @Override protected void onResume() {
-    super.onResume();
-    if (adapter != null) adapter.updateGifRating();
-    emptyTextView.setVisibility(adapter == null || adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+  @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
   }
 
   private void loadNextDataFromApi(int current_page) {
     if (Constant.DEBUG) Log.d("Listener", "onLoadMore: " + current_page);
     skip = (current_page - 1) * Constant.SEARCH_LIMIT;
-    handler.removeCallbacks(loadNextDataRunnable);
-    loadNextDataRunnable.setSkip(skip);
-    handler.post(loadNextDataRunnable);
+
+    presenter.loadGifs(query, skip, Constant.SEARCH_LIMIT);
+  }
+
+  @Override public void clearSearchResults() {
+    skip = 0;
+    adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
+    gifs.clear();
+    endlessListener.reset();
+  }
+
+  @Override public void showSearchResults(final List<Gif> newGifs) {
+    gifs.addAll(newGifs);
+    adapter.notifyItemRangeInserted(adapter.getItemCount() - 1, newGifs.size());
+    emptyTextView.setVisibility(adapter == null || adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+  }
+
+  @Override public void updateGifRating(final String gifId, final int newRating) {
+    adapter.updateGifRating(gifId, newRating);
+  }
+
+  @Override public void showProgress() {
+    floatingSearchView.showProgress();
+  }
+
+  @Override public void hideProgress() {
+    floatingSearchView.hideProgress();
+  }
+
+  @Override public void showError() {
+    Toast.makeText(SearchActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+  }
+
+  @Override public void setPresenter(SearchContract.Presenter presenter) {
+    this.presenter = presenter;
   }
 }
