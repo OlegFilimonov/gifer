@@ -1,6 +1,5 @@
 package com.olgefilimonov.gifer.contract;
 
-import com.olgefilimonov.gifer.model.Gif;
 import com.olgefilimonov.gifer.mvp.BasePresenter;
 import com.olgefilimonov.gifer.mvp.BaseView;
 
@@ -18,10 +17,10 @@ public class GifDetailContract {
     /**
      * Changes user's rating of the gif. Can be executed multiple times by the same user
      *
-     * @param gif gif to rate
+     * @param gifId gif to rate
      * @param rating can be -1 (downvote) or 1 (upvote)
      */
-    void rateGif(Gif gif, int rating);
+    void rateGif(String gifId, int rating);
   }
 
   public interface View extends BaseView<Presenter> {
@@ -31,5 +30,7 @@ public class GifDetailContract {
      * @param newRating new rating to set
      */
     void showGifRating(int newRating);
+
+    void showError();
   }
 }

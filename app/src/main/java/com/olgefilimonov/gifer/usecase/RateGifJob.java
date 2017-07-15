@@ -1,7 +1,6 @@
 package com.olgefilimonov.gifer.usecase;
 
 import android.support.annotation.Nullable;
-import com.olgefilimonov.gifer.model.Gif;
 import com.olgefilimonov.gifer.model.RatedGif;
 import com.olgefilimonov.gifer.mvp.UseCase;
 import io.objectbox.Box;
@@ -20,10 +19,8 @@ public class RateGifJob extends UseCase<RateGifJob.RequestValues, RateGifJob.Res
   }
 
   @Override protected void executeUseCase(RequestValues requestValues) throws Throwable {
-    Gif gif = requestValues.getGif();
-    gif.setScore(gif.getScore() + requestValues.getRating());
 
-    String gifId = gif.getGifId();
+    String gifId = requestValues.getGifId();
 
     RatedGif ratedGif;
     List<RatedGif> ratedGifList = gifsBox.find("gifId", gifId);
@@ -38,7 +35,7 @@ public class RateGifJob extends UseCase<RateGifJob.RequestValues, RateGifJob.Res
       throw new RuntimeException("Database error. gifId must be unique");
     }
 
-    ratedGif.setScore(gif.getScore());
+    ratedGif.setScore(ratedGif.getScore() + requestValues.getRating());
     gifsBox.put(ratedGif);
 
     onSuccess(new ResponseValues(ratedGif.getGifId(), ratedGif.getScore()));
@@ -49,20 +46,20 @@ public class RateGifJob extends UseCase<RateGifJob.RequestValues, RateGifJob.Res
   }
 
   public static final class RequestValues implements UseCase.RequestValues {
-    private Gif gif;
+    private String gifId;
     private int rating;
 
-    public RequestValues(Gif gif, int rating) {
-      this.gif = gif;
+    public RequestValues(String gifId, int rating) {
+      this.gifId = gifId;
       this.rating = rating;
     }
 
-    public Gif getGif() {
-      return gif;
+    public String getGifId() {
+      return gifId;
     }
 
-    public void setGif(Gif gif) {
-      this.gif = gif;
+    public void setGifId(String gifId) {
+      this.gifId = gifId;
     }
 
     public int getRating() {

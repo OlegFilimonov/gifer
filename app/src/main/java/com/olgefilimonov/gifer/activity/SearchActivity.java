@@ -75,7 +75,7 @@ public class SearchActivity extends AppCompatActivity implements SearchContract.
     };
     adapter = new SearchResultAdapter(gifs, this, new SearchResultAdapter.RateListener() {
       @Override public void onVote(Gif gif, int rating) {
-        presenter.rateGif(gif, rating);
+        presenter.rateGif(gif.getGifId(), rating);
       }
     });
     searchResultsRecyclerView.setLayoutManager(layoutManager);

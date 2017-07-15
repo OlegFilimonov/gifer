@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -26,11 +27,14 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.olgefilimonov.gifer.R;
+import com.olgefilimonov.gifer.contract.GifDetailContract;
+import com.olgefilimonov.gifer.presenter.GifDetailPresenter;
 
 /**
  * @author Oleg Filimonov
  */
-public class GifDetailActivity extends AppCompatActivity {
+public class GifDetailActivity extends AppCompatActivity implements GifDetailContract.View {
+
   public static final String URL_EXTRA = "URL";
   public static final String GIF_ID_EXTRA = "gifId";
 
@@ -42,20 +46,20 @@ public class GifDetailActivity extends AppCompatActivity {
   private String url;
   private String gifId;
 
+  private GifDetailContract.Presenter presenter;
+
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_gif_detail);
     ButterKnife.bind(this);
 
     // Presenter
-
+    new GifDetailPresenter(this);
     // Setup
     setupExtras();
     setupPlayer();
 
-    // Check the rating
-    checkGifRating();
-    updateScore();
+    presenter.updateGifRating(gifId);
   }
 
   private void setupPlayer() {
@@ -99,10 +103,22 @@ public class GifDetailActivity extends AppCompatActivity {
   }
 
   @OnClick(R.id.gif_like) void onGifLike() {
-
+    presenter.rateGif(gifId, +1);
   }
 
   @OnClick(R.id.gif_dislike) void onGifDislike() {
+    presenter.rateGif(gifId, -1);
+  }
 
+  @Override public void setPresenter(GifDetailContract.Presenter presenter) {
+    this.presenter = presenter;
+  }
+
+  @Override public void showGifRating(int newRating) {
+    score.setText(String.valueOf(newRating));
+  }
+
+  @Override public void showError() {
+    Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show();
   }
 }

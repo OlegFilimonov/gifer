@@ -24,10 +24,10 @@ public class SearchContract {
     /**
      * Changes user's rating of the gif. Can be executed multiple times by the same user
      *
-     * @param gif gif to rate
+     * @param gifId gif to rate
      * @param rating can be -1 (downvote) or 1 (upvote)
      */
-    void rateGif(Gif gif, int rating);
+    void rateGif(String gifId, int rating);
   }
 
   public interface View extends BaseView<Presenter> {
