@@ -41,6 +41,8 @@ public class LoadGifsJob extends UseCase<LoadGifsJob.RequestValues, LoadGifsJob.
       if (data != null) {
         for (Datum datum : data) {
           String previewUrl = datum.getImages().getDownsizedStill().getUrl();
+          // Sometimes original MP4 is unavailable. If so, don't add the gif
+          if (datum.getImages().getOriginalMp4() == null) continue;
           String videoUrl = datum.getImages().getOriginalMp4().getMp4();
           Gif gif = new Gif(datum.getId(), videoUrl, previewUrl);
           gifs.add(gif);

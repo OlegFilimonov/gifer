@@ -13,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.BindView;
 import com.arlib.floatingsearchview.FloatingSearchView;
+import com.bluelinelabs.conductor.RouterTransaction;
+import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.olgefilimonov.gifer.R;
 import com.olgefilimonov.gifer.adapter.SearchResultAdapter;
 import com.olgefilimonov.gifer.contract.SearchContract;
@@ -39,6 +41,10 @@ public class SearchController extends BaseController implements SearchContract.V
   private int skip = 0;
   private SearchResultAdapter adapter;
   private EndlessRecyclerGridOnScrollListener endlessListener;
+  /**
+   * Stored id of the clicked gif in order to update it when gif detail page is closed
+   */
+  private String clickedGifId;
 
   @Override protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
     return inflater.inflate(R.layout.activity_search, container, false);
@@ -53,6 +59,14 @@ public class SearchController extends BaseController implements SearchContract.V
     setupRecyclerView();
     // Setup API
     setupSearch();
+  }
+
+  @Override protected void onAttach(@NonNull View view) {
+    super.onAttach(view);
+    if (clickedGifId != null) {
+      presenter.updateGifRating(clickedGifId);
+      clickedGifId = null;
+    }
   }
 
   private void setupSearch() {
@@ -79,11 +93,11 @@ public class SearchController extends BaseController implements SearchContract.V
       }
 
       @Override public void onItemClick(Gif gif) {
-        //Intent intent = new Intent(activity, GifDetailActivity.class);
-        //intent.putExtra(URL_EXTRA, gif.getVideoUrl());
-        //intent.putExtra(GIF_ID_EXTRA, gif.getGifId());
-        //activity.startActivityForResult(intent, REQUEST_GIF_DETAIL);
-
+        // Save gif id to update it later
+        clickedGifId = gif.getGifId();
+        getRouter().pushController(RouterTransaction.with(new GifDetailController(gif.getVideoUrl(), gif.getGifId()))
+            .pushChangeHandler(new FadeChangeHandler())
+            .popChangeHandler(new FadeChangeHandler()));
       }
     });
     searchResultsRecyclerView.setLayoutManager(layoutManager);

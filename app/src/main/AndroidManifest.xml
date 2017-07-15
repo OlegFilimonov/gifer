@@ -12,11 +12,6 @@
       android:theme="@style/AppTheme">
 
     <!--Remove these-->
-    <activity
-        android:name=".activity.GifDetailActivity"
-        android:label="@string/title_activity_gif_detail"
-        android:theme="@style/AppTheme.NoActionBar">
-    </activity>
 
     <!--Keep this only-->
     <activity
