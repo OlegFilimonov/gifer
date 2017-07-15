@@ -9,6 +9,7 @@ import com.birbit.android.jobqueue.RetryConstraint;
 import com.olgefilimonov.gifer.client.DefaultApi;
 import com.olgefilimonov.gifer.singleton.Constant;
 import com.olgefilimonov.gifer.singleton.GiferApplication;
+import javax.inject.Inject;
 
 /**
  * Use cases are the entry points to the domain layer.
@@ -18,7 +19,7 @@ import com.olgefilimonov.gifer.singleton.GiferApplication;
 public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase.ResponseValue> extends Job {
   private static final String TAG = "JOB";
   protected Q requestValues;
-  protected DefaultApi defaultApi;
+  @Inject protected DefaultApi defaultApi;
   private UseCaseCallback<P> useCaseCallback;
   private Handler handler;
 
@@ -31,7 +32,7 @@ public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase
     this.requestValues = requestValues;
     this.useCaseCallback = useCaseCallback;
     this.handler = new Handler(Looper.getMainLooper());
-    defaultApi = GiferApplication.getInstance().getApiClient().createService(DefaultApi.class);
+    GiferApplication.getInstance().getComponent().inject((UseCase<RequestValues, ResponseValue>) this);
   }
 
   @Override public void onAdded() {

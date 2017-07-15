@@ -13,22 +13,21 @@ import com.olgefilimonov.gifer.usecase.RateGifJob;
 import io.objectbox.BoxStore;
 import java.util.List;
 import java.util.UUID;
+import javax.inject.Inject;
 
 /**
  * @author Oleg Filimonov
  */
 
 public class SearchPresenter implements SearchContract.Presenter {
+  @Inject JobManager jobManager;
+  @Inject BoxStore boxStore;
   private SearchContract.View view;
-  private JobManager jobManager;
   private String tag = UUID.randomUUID().toString();
-  private BoxStore boxStore;
 
   public SearchPresenter(SearchContract.View view) {
     this.view = view;
-    this.jobManager = GiferApplication.getInstance().getJobManager();
-    this.boxStore = GiferApplication.getInstance().getBoxStore();
-
+    GiferApplication.getInstance().getComponent().inject(this);
     view.setPresenter(this);
   }
 
@@ -57,7 +56,7 @@ public class SearchPresenter implements SearchContract.Presenter {
 
   @Override public void updateGifRating(String gifId) {
     CheckGifRatingJob.RequestValues requestValues = new CheckGifRatingJob.RequestValues(gifId);
-    jobManager.addJobInBackground(new CheckGifRatingJob(requestValues, tag, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
+    CheckGifRatingJob job = new CheckGifRatingJob(requestValues, tag, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
       @Override public void onSuccess(CheckGifRatingJob.ResponseValues response) {
         view.showGifRating(response.getGifId(), response.getNewRating());
       }
@@ -65,7 +64,8 @@ public class SearchPresenter implements SearchContract.Presenter {
       @Override public void onError() {
         view.showError();
       }
-    }));
+    });
+    jobManager.addJobInBackground(job);
   }
 
   @Override public void rateGif(String gifId, int rating) {

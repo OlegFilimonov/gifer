@@ -9,6 +9,7 @@ import com.olgefilimonov.gifer.usecase.CheckGifRatingJob;
 import com.olgefilimonov.gifer.usecase.RateGifJob;
 import io.objectbox.BoxStore;
 import java.util.UUID;
+import javax.inject.Inject;
 
 /**
  * @author Oleg Filimonov
@@ -16,21 +17,19 @@ import java.util.UUID;
 
 public class GifDetailPresenter implements GifDetailContract.Presenter {
   private final GifDetailContract.View view;
-  private JobManager jobManager;
+  @Inject JobManager jobManager;
+  @Inject BoxStore boxStore;
   private String tag = UUID.randomUUID().toString();
-  private BoxStore boxStore;
 
   public GifDetailPresenter(GifDetailContract.View view) {
     this.view = view;
-    this.jobManager = GiferApplication.getInstance().getJobManager();
-    this.boxStore = GiferApplication.getInstance().getBoxStore();
-
+    GiferApplication.getInstance().getComponent().inject(this);
     view.setPresenter(this);
   }
 
   @Override public void updateGifRating(String gifId) {
     CheckGifRatingJob.RequestValues requestValues = new CheckGifRatingJob.RequestValues(gifId);
-    jobManager.addJobInBackground(new CheckGifRatingJob(requestValues, tag, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
+    CheckGifRatingJob job = new CheckGifRatingJob(requestValues, tag, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
       @Override public void onSuccess(CheckGifRatingJob.ResponseValues response) {
         view.showGifRating(response.getNewRating());
       }
@@ -38,7 +37,8 @@ public class GifDetailPresenter implements GifDetailContract.Presenter {
       @Override public void onError() {
         view.showError();
       }
-    }));
+    });
+    jobManager.addJobInBackground(job);
   }
 
   @Override public void rateGif(String gifId, int rating) {

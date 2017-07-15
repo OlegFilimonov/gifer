@@ -13,9 +13,6 @@ import butterknife.ButterKnife;
 import com.bumptech.glide.Glide;
 import com.olgefilimonov.gifer.R;
 import com.olgefilimonov.gifer.model.Gif;
-import com.olgefilimonov.gifer.model.RatedGif;
-import com.olgefilimonov.gifer.singleton.GiferApplication;
-import io.objectbox.Box;
 import java.util.List;
 
 /**
@@ -23,7 +20,6 @@ import java.util.List;
  */
 
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder> {
-  private final Box<RatedGif> gifsBox;
   private List<Gif> gifs;
   private Activity activity;
   private SearchAdapterListener searchAdapterListener;
@@ -32,7 +28,6 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     this.gifs = gifs;
     this.activity = activity;
     this.searchAdapterListener = searchAdapterListener;
-    this.gifsBox = GiferApplication.getInstance().getBoxStore().boxFor(RatedGif.class);
   }
 
   public void updateGifRating(String gifId, int newRating) {
