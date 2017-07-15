@@ -21,7 +21,7 @@ public class RateGifJob extends UseCase<RateGifJob.RequestValues, RateGifJob.Res
 
   @Override protected void executeUseCase(RequestValues requestValues) throws Throwable {
     Gif gif = requestValues.getGif();
-    gif.setScore(gif.getScore() + 1);
+    gif.setScore(gif.getScore() + requestValues.getRating());
 
     String gifId = gif.getGifId();
 

@@ -44,8 +44,26 @@ public class SearchActivity extends AppCompatActivity implements SearchContract.
     setContentView(R.layout.activity_search);
     ButterKnife.bind(this);
 
+    // Setup Presenter
     new SearchPresenter(this);
     // Setup recyclerView
+    setupRecyclerView();
+    // Setup API
+    setupSearch();
+  }
+
+  private void setupSearch() {
+    floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+      @Override public void onSearchTextChanged(String oldQuery, String newQuery) {
+        clearSearchResults();
+        // Save query for the endless endlessListener
+        query = newQuery;
+        presenter.loadGifs(query, skip, Constant.SEARCH_LIMIT);
+      }
+    });
+  }
+
+  private void setupRecyclerView() {
     GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
     endlessListener = new EndlessRecyclerGridOnScrollListener(layoutManager) {
       @Override public void onLoadMore(int current_page) {
@@ -69,25 +87,20 @@ public class SearchActivity extends AppCompatActivity implements SearchContract.
         imm.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
       }
     });
-    // Setup API
-    floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
-      @Override public void onSearchTextChanged(String oldQuery, String newQuery) {
-        clearSearchResults();
-        // Save query for the endless endlessListener
-        query = newQuery;
-        presenter.loadGifs(query, skip, Constant.SEARCH_LIMIT);
-      }
-    });
   }
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
   }
 
+  /**
+   * Loads next page of the gifs
+   *
+   * @param current_page page, starts from 1
+   */
   private void loadNextDataFromApi(int current_page) {
     if (Constant.DEBUG) Log.d("Listener", "onLoadMore: " + current_page);
     skip = (current_page - 1) * Constant.SEARCH_LIMIT;
-
     presenter.loadGifs(query, skip, Constant.SEARCH_LIMIT);
   }
 
