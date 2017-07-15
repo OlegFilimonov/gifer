@@ -11,10 +11,6 @@ import static com.olgefilimonov.gifer.singleton.Constant.API_V1;
  * @author Oleg Filimonov
  */
 public interface DefaultApi {
-  @GET(API_V1 + "gifs/search") Call<GiphyResponse> searchGifs(
-      @Query("api_key") String apiKey,
-      @Query("q") String query,
-      @Query("limit") Integer limit,
-      @Query("offset") Integer offset
-  );
+  @GET(API_V1 + "gifs/search") Call<GiphyResponse> searchGifs(@Query("api_key") String apiKey, @Query("q") String query, @Query("limit") Integer limit,
+      @Query("offset") Integer offset);
 }

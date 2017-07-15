@@ -55,6 +55,7 @@ public class GifDetailActivity extends AppCompatActivity implements GifDetailCon
 
     // Presenter
     new GifDetailPresenter(this);
+
     // Setup
     setupExtras();
     setupPlayer();

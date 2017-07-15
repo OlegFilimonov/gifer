@@ -1,7 +1,5 @@
 package com.olgefilimonov.gifer.model;
 
-import io.objectbox.annotation.Entity;
-
 /**
  * @author Oleg Filimonov
  */
@@ -11,14 +9,6 @@ public class Gif {
   private String previewUrl;
   private int score;
 
-  public int getScore() {
-    return score;
-  }
-
-  public void setScore(int score) {
-    this.score = score;
-  }
-
   public Gif() {
   }
 
@@ -26,6 +16,14 @@ public class Gif {
     this.gifId = gifId;
     this.videoUrl = videoUrl;
     this.previewUrl = previewUrl;
+  }
+
+  public int getScore() {
+    return score;
+  }
+
+  public void setScore(int score) {
+    this.score = score;
   }
 
   public String getGifId() {
