@@ -19,6 +19,7 @@ import retrofit2.Response;
 public class LoadGifsJob extends UseCase<LoadGifsJob.RequestValues, LoadGifsJob.ResponseValue> {
   private final Box<RatedGif> gifsBox;
   private String apiKey;
+  private List<Datum> data;
 
   public LoadGifsJob(RequestValues requestValues, String tag, String apiKey, Box<RatedGif> gifsBox, UseCaseCallback<ResponseValue> useCaseCallback) {
     super(requestValues, tag, useCaseCallback);
@@ -35,11 +36,15 @@ public class LoadGifsJob extends UseCase<LoadGifsJob.RequestValues, LoadGifsJob.
       List<Gif> gifs = new ArrayList<>();
 
       // Convert gifs to the local model
-      for (Datum datum : response.body().getData()) {
-        String previewUrl = datum.getImages().getDownsizedStill().getUrl();
-        String videoUrl = datum.getImages().getOriginalMp4().getMp4();
-        Gif gif = new Gif(datum.getId(), videoUrl, previewUrl);
-        gifs.add(gif);
+      GiphyResponse body = response.body();
+      data = body != null ? body.getData() : null;
+      if (data != null) {
+        for (Datum datum : data) {
+          String previewUrl = datum.getImages().getDownsizedStill().getUrl();
+          String videoUrl = datum.getImages().getOriginalMp4().getMp4();
+          Gif gif = new Gif(datum.getId(), videoUrl, previewUrl);
+          gifs.add(gif);
+        }
       }
 
       // Check user ratings

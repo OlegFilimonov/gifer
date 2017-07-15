@@ -1,7 +1,6 @@
 package com.olgefilimonov.gifer.adapter;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,16 +12,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.bumptech.glide.Glide;
 import com.olgefilimonov.gifer.R;
-import com.olgefilimonov.gifer.activity.GifDetailActivity;
 import com.olgefilimonov.gifer.model.Gif;
 import com.olgefilimonov.gifer.model.RatedGif;
 import com.olgefilimonov.gifer.singleton.GiferApplication;
 import io.objectbox.Box;
 import java.util.List;
-
-import static com.olgefilimonov.gifer.activity.GifDetailActivity.GIF_ID_EXTRA;
-import static com.olgefilimonov.gifer.activity.GifDetailActivity.URL_EXTRA;
-import static com.olgefilimonov.gifer.activity.SearchActivity.REQUEST_GIF_DETAIL;
 
 /**
  * @author Oleg Filimonov
@@ -32,12 +26,12 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
   private final Box<RatedGif> gifsBox;
   private List<Gif> gifs;
   private Activity activity;
-  private RateListener rateListener;
+  private SearchAdapterListener searchAdapterListener;
 
-  public SearchResultAdapter(List<Gif> gifs, Activity activity, RateListener rateListener) {
+  public SearchResultAdapter(List<Gif> gifs, Activity activity, SearchAdapterListener searchAdapterListener) {
     this.gifs = gifs;
     this.activity = activity;
-    this.rateListener = rateListener;
+    this.searchAdapterListener = searchAdapterListener;
     this.gifsBox = GiferApplication.getInstance().getBoxStore().boxFor(RatedGif.class);
   }
 
@@ -65,23 +59,20 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     // Setup click
     holder.card.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-        Intent intent = new Intent(activity, GifDetailActivity.class);
-        intent.putExtra(URL_EXTRA, gif.getVideoUrl());
-        intent.putExtra(GIF_ID_EXTRA, gif.getGifId());
-        activity.startActivityForResult(intent, REQUEST_GIF_DETAIL);
+        searchAdapterListener.onItemClick(gif);
       }
     });
     holder.score.setText(String.valueOf(gif.getScore()));
     // Likes & Dislike click
     holder.like.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-        rateListener.onVote(gif, 1);
+        searchAdapterListener.onItemRated(gif, 1);
       }
     });
 
     holder.dislike.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-        rateListener.onVote(gif, -1);
+        searchAdapterListener.onItemRated(gif, -1);
       }
     });
   }
@@ -90,8 +81,10 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     return gifs.size();
   }
 
-  public interface RateListener {
-    void onVote(Gif gif, int rating);
+  public interface SearchAdapterListener {
+    void onItemRated(Gif gif, int rating);
+
+    void onItemClick(Gif gif);
   }
 
   class SearchResultViewHolder extends RecyclerView.ViewHolder {

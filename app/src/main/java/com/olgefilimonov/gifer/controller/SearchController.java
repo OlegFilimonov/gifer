@@ -1,18 +1,17 @@
-package com.olgefilimonov.gifer.activity;
+package com.olgefilimonov.gifer.controller;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.olgefilimonov.gifer.R;
 import com.olgefilimonov.gifer.adapter.SearchResultAdapter;
@@ -24,28 +23,29 @@ import com.olgefilimonov.gifer.singleton.Constant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.olgefilimonov.gifer.activity.GifDetailActivity.GIF_ID_EXTRA;
-
 /**
  * @author Oleg Filimonov
  */
-public class SearchActivity extends AppCompatActivity implements SearchContract.View {
+
+public class SearchController extends BaseController implements SearchContract.View {
+
   public static final int REQUEST_GIF_DETAIL = 974;
   @BindView(R.id.floating_search_view) FloatingSearchView floatingSearchView;
   @BindView(R.id.empty_text_view) TextView emptyTextView;
   @BindView(R.id.recycler_view) RecyclerView searchResultsRecyclerView;
+  private SearchContract.Presenter presenter;
   private List<Gif> gifs = new ArrayList<>();
   private String query;
   private int skip = 0;
   private SearchResultAdapter adapter;
   private EndlessRecyclerGridOnScrollListener endlessListener;
 
-  private SearchContract.Presenter presenter;
+  @Override protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
+    return inflater.inflate(R.layout.activity_search, container, false);
+  }
 
-  @Override protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_search);
-    ButterKnife.bind(this);
+  @Override protected void onViewBound(@NonNull View view) {
+    super.onViewBound(view);
 
     // Setup Presenter
     new SearchPresenter(this);
@@ -67,15 +67,23 @@ public class SearchActivity extends AppCompatActivity implements SearchContract.
   }
 
   private void setupRecyclerView() {
-    GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+    GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
     endlessListener = new EndlessRecyclerGridOnScrollListener(layoutManager) {
       @Override public void onLoadMore(int current_page) {
         loadNextDataFromApi(current_page);
       }
     };
-    adapter = new SearchResultAdapter(gifs, this, new SearchResultAdapter.RateListener() {
-      @Override public void onVote(Gif gif, int rating) {
+    adapter = new SearchResultAdapter(gifs, getActivity(), new SearchResultAdapter.SearchAdapterListener() {
+      @Override public void onItemRated(Gif gif, int rating) {
         presenter.rateGif(gif.getGifId(), rating);
+      }
+
+      @Override public void onItemClick(Gif gif) {
+        //Intent intent = new Intent(activity, GifDetailActivity.class);
+        //intent.putExtra(URL_EXTRA, gif.getVideoUrl());
+        //intent.putExtra(GIF_ID_EXTRA, gif.getGifId());
+        //activity.startActivityForResult(intent, REQUEST_GIF_DETAIL);
+
       }
     });
     searchResultsRecyclerView.setLayoutManager(layoutManager);
@@ -86,19 +94,10 @@ public class SearchActivity extends AppCompatActivity implements SearchContract.
         super.onScrollStateChanged(recyclerView, newState);
 
         // Hide keyboard
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
       }
     });
-  }
-
-  @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-    if (requestCode == REQUEST_GIF_DETAIL && resultCode == RESULT_OK) {
-      // Update opened gif's rating
-      String gifId = data.getStringExtra(GIF_ID_EXTRA);
-      presenter.updateGifRating(gifId);
-    }
   }
 
   /**
@@ -138,7 +137,7 @@ public class SearchActivity extends AppCompatActivity implements SearchContract.
   }
 
   @Override public void showError() {
-    Toast.makeText(SearchActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+    Toast.makeText(getActivity(), "Error!", Toast.LENGTH_SHORT).show();
   }
 
   @Override public void setPresenter(SearchContract.Presenter presenter) {
