@@ -1,6 +1,7 @@
 package com.olgefilimonov.gifer.usecase;
 
 import android.support.annotation.Nullable;
+import com.birbit.android.jobqueue.Params;
 import com.olgefilimonov.gifer.model.RatedGif;
 import com.olgefilimonov.gifer.mvp.UseCase;
 import io.objectbox.Box;
@@ -13,8 +14,8 @@ import java.util.List;
 public class RateGifJob extends UseCase<RateGifJob.RequestValues, RateGifJob.ResponseValues> {
   private final Box<RatedGif> gifsBox;
 
-  public RateGifJob(RequestValues requestValues, String tag, Box<RatedGif> gifsBox, UseCaseCallback<ResponseValues> useCaseCallback) {
-    super(requestValues, tag, useCaseCallback);
+  public RateGifJob(RequestValues requestValues, Box<RatedGif> gifsBox, UseCaseCallback<ResponseValues> useCaseCallback, Params params) {
+    super(requestValues, useCaseCallback, params);
     this.gifsBox = gifsBox;
   }
 

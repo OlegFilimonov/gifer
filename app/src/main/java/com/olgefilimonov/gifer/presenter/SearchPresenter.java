@@ -1,6 +1,8 @@
 package com.olgefilimonov.gifer.presenter;
 
 import com.birbit.android.jobqueue.JobManager;
+import com.birbit.android.jobqueue.Params;
+import com.birbit.android.jobqueue.TagConstraint;
 import com.olgefilimonov.gifer.contract.SearchContract;
 import com.olgefilimonov.gifer.model.Gif;
 import com.olgefilimonov.gifer.model.RatedGif;
@@ -20,10 +22,14 @@ import javax.inject.Inject;
  */
 
 public class SearchPresenter implements SearchContract.Presenter {
+  /**
+   * A tag that is unique to this presenter instance. Can be used to cancel all jobs of the presenter at once
+   */
+  private final String presenterTag = UUID.randomUUID().toString();
+  private final String loadGifsTag = "load_gifs";
   @Inject JobManager jobManager;
   @Inject BoxStore boxStore;
   private SearchContract.View view;
-  private String tag = UUID.randomUUID().toString();
 
   public SearchPresenter(SearchContract.View view) {
     this.view = view;
@@ -31,13 +37,15 @@ public class SearchPresenter implements SearchContract.Presenter {
     view.setPresenter(this);
   }
 
-  @Override public void loadGifs(String query, int page, int limit) {
+  @Override public void loadGifs(String query, final int skip, int limit) {
     view.showProgress();
+    // Cancel all previous jobs
+    jobManager.cancelJobsInBackground(null, TagConstraint.ALL, loadGifsTag);
     // Setup callback
     UseCase.UseCaseCallback<LoadGifsJob.ResponseValue> useCaseCallback = new UseCase.UseCaseCallback<LoadGifsJob.ResponseValue>() {
       @Override public void onSuccess(LoadGifsJob.ResponseValue response) {
-
         view.hideProgress();
+        if (skip == 0) view.clearSearchResults();
         List<Gif> gifs = response.getGifs();
         view.showSearchResults(gifs);
       }
@@ -48,15 +56,16 @@ public class SearchPresenter implements SearchContract.Presenter {
       }
     };
     // Setup the job
-    LoadGifsJob.RequestValues requestValues = new LoadGifsJob.RequestValues(query, page, limit);
-    LoadGifsJob job = new LoadGifsJob(requestValues, tag, Constant.GIPHER_API_KEY, boxStore.boxFor(RatedGif.class), useCaseCallback);
+    LoadGifsJob.RequestValues requestValues = new LoadGifsJob.RequestValues(query, skip, limit);
+    LoadGifsJob job = new LoadGifsJob(requestValues, Constant.GIPHER_API_KEY, boxStore.boxFor(RatedGif.class), useCaseCallback,
+        new Params(Constant.DEFAULT_PRIORITY).addTags(presenterTag, loadGifsTag));
     // Execute the job
     jobManager.addJobInBackground(job);
   }
 
   @Override public void updateGifRating(String gifId) {
     CheckGifRatingJob.RequestValues requestValues = new CheckGifRatingJob.RequestValues(gifId);
-    CheckGifRatingJob job = new CheckGifRatingJob(requestValues, tag, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
+    CheckGifRatingJob job = new CheckGifRatingJob(requestValues, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
       @Override public void onSuccess(CheckGifRatingJob.ResponseValues response) {
         view.showGifRating(response.getGifId(), response.getNewRating());
       }
@@ -64,7 +73,7 @@ public class SearchPresenter implements SearchContract.Presenter {
       @Override public void onError() {
         view.showError();
       }
-    });
+    }, new Params(Constant.DEFAULT_PRIORITY).addTags(presenterTag));
     jobManager.addJobInBackground(job);
   }
 
@@ -79,7 +88,7 @@ public class SearchPresenter implements SearchContract.Presenter {
         view.showError();
       }
     };
-    RateGifJob job = new RateGifJob(requestValues, tag, boxStore.boxFor(RatedGif.class), useCaseCallback);
+    RateGifJob job = new RateGifJob(requestValues, boxStore.boxFor(RatedGif.class), useCaseCallback, new Params(Constant.DEFAULT_PRIORITY).addTags(presenterTag));
     jobManager.addJobInBackground(job);
   }
 }

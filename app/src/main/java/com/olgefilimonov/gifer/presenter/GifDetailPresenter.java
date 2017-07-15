@@ -1,9 +1,11 @@
 package com.olgefilimonov.gifer.presenter;
 
 import com.birbit.android.jobqueue.JobManager;
+import com.birbit.android.jobqueue.Params;
 import com.olgefilimonov.gifer.contract.GifDetailContract;
 import com.olgefilimonov.gifer.model.RatedGif;
 import com.olgefilimonov.gifer.mvp.UseCase;
+import com.olgefilimonov.gifer.singleton.Constant;
 import com.olgefilimonov.gifer.singleton.GiferApplication;
 import com.olgefilimonov.gifer.usecase.CheckGifRatingJob;
 import com.olgefilimonov.gifer.usecase.RateGifJob;
@@ -29,7 +31,7 @@ public class GifDetailPresenter implements GifDetailContract.Presenter {
 
   @Override public void updateGifRating(String gifId) {
     CheckGifRatingJob.RequestValues requestValues = new CheckGifRatingJob.RequestValues(gifId);
-    CheckGifRatingJob job = new CheckGifRatingJob(requestValues, tag, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
+    CheckGifRatingJob job = new CheckGifRatingJob(requestValues, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
       @Override public void onSuccess(CheckGifRatingJob.ResponseValues response) {
         view.showGifRating(response.getNewRating());
       }
@@ -37,7 +39,7 @@ public class GifDetailPresenter implements GifDetailContract.Presenter {
       @Override public void onError() {
         view.showError();
       }
-    });
+    }, new Params(Constant.DEFAULT_PRIORITY).addTags(tag));
     jobManager.addJobInBackground(job);
   }
 
@@ -52,7 +54,7 @@ public class GifDetailPresenter implements GifDetailContract.Presenter {
         view.showError();
       }
     };
-    RateGifJob job = new RateGifJob(requestValues, tag, boxStore.boxFor(RatedGif.class), useCaseCallback);
+    RateGifJob job = new RateGifJob(requestValues, boxStore.boxFor(RatedGif.class), useCaseCallback, new Params(Constant.DEFAULT_PRIORITY).addTags(tag));
     jobManager.addJobInBackground(job);
   }
 }

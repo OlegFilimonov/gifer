@@ -7,7 +7,6 @@ import com.birbit.android.jobqueue.Job;
 import com.birbit.android.jobqueue.Params;
 import com.birbit.android.jobqueue.RetryConstraint;
 import com.olgefilimonov.gifer.client.DefaultApi;
-import com.olgefilimonov.gifer.singleton.Constant;
 import com.olgefilimonov.gifer.singleton.GiferApplication;
 import javax.inject.Inject;
 
@@ -23,12 +22,8 @@ public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase
   private UseCaseCallback<P> useCaseCallback;
   private Handler handler;
 
-  protected UseCase(Q requestValues, String tag, UseCaseCallback<P> useCaseCallback) {
-    this(requestValues, Constant.DEFAULT_PRIORITY, tag, useCaseCallback);
-  }
-
-  protected UseCase(Q requestValues, int priority, String tag, UseCaseCallback<P> useCaseCallback) {
-    super(new Params(priority).addTags(tag));
+  protected UseCase(Q requestValues, UseCaseCallback<P> useCaseCallback, Params params) {
+    super(params);
     this.requestValues = requestValues;
     this.useCaseCallback = useCaseCallback;
     this.handler = new Handler(Looper.getMainLooper());

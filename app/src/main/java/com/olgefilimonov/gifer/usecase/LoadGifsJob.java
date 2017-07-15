@@ -1,6 +1,7 @@
 package com.olgefilimonov.gifer.usecase;
 
 import android.support.annotation.Nullable;
+import com.birbit.android.jobqueue.Params;
 import com.olgefilimonov.gifer.model.Datum;
 import com.olgefilimonov.gifer.model.Gif;
 import com.olgefilimonov.gifer.model.GiphyResponse;
@@ -19,10 +20,9 @@ import retrofit2.Response;
 public class LoadGifsJob extends UseCase<LoadGifsJob.RequestValues, LoadGifsJob.ResponseValue> {
   private final Box<RatedGif> gifsBox;
   private String apiKey;
-  private List<Datum> data;
 
-  public LoadGifsJob(RequestValues requestValues, String tag, String apiKey, Box<RatedGif> gifsBox, UseCaseCallback<ResponseValue> useCaseCallback) {
-    super(requestValues, tag, useCaseCallback);
+  public LoadGifsJob(RequestValues requestValues, String apiKey, Box<RatedGif> gifsBox, UseCaseCallback<ResponseValue> useCaseCallback, Params params) {
+    super(requestValues, useCaseCallback, params);
     this.apiKey = apiKey;
     this.gifsBox = gifsBox;
   }
@@ -37,7 +37,7 @@ public class LoadGifsJob extends UseCase<LoadGifsJob.RequestValues, LoadGifsJob.
 
       // Convert gifs to the local model
       GiphyResponse body = response.body();
-      data = body != null ? body.getData() : null;
+      List<Datum> data = body != null ? body.getData() : null;
       if (data != null) {
         for (Datum datum : data) {
           String previewUrl = datum.getImages().getDownsizedStill().getUrl();
@@ -70,7 +70,7 @@ public class LoadGifsJob extends UseCase<LoadGifsJob.RequestValues, LoadGifsJob.
   }
 
   @Override protected void onCancel(int cancelReason, @Nullable Throwable throwable) {
-    onError();
+    // Do nothing
   }
 
   public static final class RequestValues implements UseCase.RequestValues {
