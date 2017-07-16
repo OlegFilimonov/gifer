@@ -69,6 +69,7 @@ public class SearchController extends BaseController implements SearchContract.V
       presenter.updateGifRating(clickedGifId);
       clickedGifId = null;
     }
+    updateEmptyText();
   }
 
   private void setupSearch() {
@@ -109,6 +110,7 @@ public class SearchController extends BaseController implements SearchContract.V
     });
     searchResultsRecyclerView.setLayoutManager(layoutManager);
     searchResultsRecyclerView.setAdapter(adapter);
+    searchResultsRecyclerView.setHasFixedSize(true);
     searchResultsRecyclerView.addOnScrollListener(endlessListener);
     searchResultsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
       @Override public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -153,7 +155,6 @@ public class SearchController extends BaseController implements SearchContract.V
     skip = 0;
     adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
     gifs.clear();
-
     endlessListener.reset();
   }
 

@@ -45,6 +45,7 @@ public class SearchPresenter implements SearchContract.Presenter {
     UseCase.UseCaseCallback<LoadGifsJob.ResponseValue> useCaseCallback = new UseCase.UseCaseCallback<LoadGifsJob.ResponseValue>() {
       @Override public void onSuccess(LoadGifsJob.ResponseValue response) {
         view.hideProgress();
+        // Reset search results if we're on the first page
         if (skip == 0) view.clearSearchResults();
         List<Gif> gifs = response.getGifs();
         view.showSearchResults(gifs);

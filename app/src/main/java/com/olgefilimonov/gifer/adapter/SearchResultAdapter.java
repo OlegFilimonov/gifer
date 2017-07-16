@@ -10,9 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import com.bumptech.glide.Glide;
 import com.olgefilimonov.gifer.R;
 import com.olgefilimonov.gifer.model.Gif;
+import com.squareup.picasso.Picasso;
 import java.util.List;
 
 /**
@@ -50,7 +50,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     final Gif gif = gifs.get(position);
 
     // Load preview image
-    Glide.with(activity).load(gif.getPreviewUrl()).into(holder.image);
+    Picasso.with(activity).load(gif.getPreviewUrl()).fit().centerCrop().into(holder.image);
     // Setup click
     holder.card.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
