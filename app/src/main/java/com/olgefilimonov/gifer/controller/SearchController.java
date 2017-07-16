@@ -21,7 +21,9 @@ import com.olgefilimonov.gifer.contract.SearchContract;
 import com.olgefilimonov.gifer.listener.EndlessRecyclerGridOnScrollListener;
 import com.olgefilimonov.gifer.model.Gif;
 import com.olgefilimonov.gifer.presenter.SearchPresenter;
+import com.olgefilimonov.gifer.rxjava.RxFloatingSearchView;
 import com.olgefilimonov.gifer.singleton.Constant;
+import io.reactivex.functions.Consumer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,10 +33,10 @@ import java.util.List;
 
 public class SearchController extends BaseController implements SearchContract.View {
 
-  public static final int REQUEST_GIF_DETAIL = 974;
   @BindView(R.id.floating_search_view) FloatingSearchView floatingSearchView;
   @BindView(R.id.empty_text_view) TextView emptyTextView;
   @BindView(R.id.recycler_view) RecyclerView searchResultsRecyclerView;
+
   private SearchContract.Presenter presenter;
   private List<Gif> gifs = new ArrayList<>();
   private String query;
@@ -70,17 +72,22 @@ public class SearchController extends BaseController implements SearchContract.V
   }
 
   private void setupSearch() {
-    floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
-      @Override public void onSearchTextChanged(String oldQuery, String newQuery) {
+    RxFloatingSearchView.queryChanges(floatingSearchView).doOnNext(new Consumer<CharSequence>() {
+      @Override public void accept(@io.reactivex.annotations.NonNull CharSequence charSequence) throws Exception {
         clearSearchResults();
         // Save query for the endless endlessListener
-        query = newQuery;
-        presenter.loadGifs(query, skip, Constant.SEARCH_LIMIT);
+        query = charSequence.toString();
+        if (query.equals("")) {
+          updateEmptyText();
+        } else {
+          presenter.loadGifs(query, skip, Constant.SEARCH_LIMIT);
+        }
       }
-    });
+    }).subscribe();
   }
 
   private void setupRecyclerView() {
+
     GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
     endlessListener = new EndlessRecyclerGridOnScrollListener(layoutManager) {
       @Override public void onLoadMore(int current_page) {
@@ -125,17 +132,35 @@ public class SearchController extends BaseController implements SearchContract.V
     presenter.loadGifs(query, skip, Constant.SEARCH_LIMIT);
   }
 
+  private void updateEmptyText() {
+    // Update empty text drawable
+    boolean empty = gifs.isEmpty();
+    if (empty) {
+      emptyTextView.setVisibility(View.VISIBLE);
+      // If text is empty show an empty string. Otherwise show "no results"
+      if (query == null || query.equals("")) {
+        emptyTextView.setText(R.string.search_empty);
+      } else {
+        String text = String.format(getActivity().getString(R.string.search_no_results), query);
+        emptyTextView.setText(text);
+      }
+    } else {
+      emptyTextView.setVisibility(View.GONE);
+    }
+  }
+
   @Override public void clearSearchResults() {
     skip = 0;
     adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
     gifs.clear();
+
     endlessListener.reset();
   }
 
   @Override public void showSearchResults(final List<Gif> newGifs) {
     gifs.addAll(newGifs);
+    updateEmptyText();
     adapter.notifyItemRangeInserted(adapter.getItemCount() - 1, newGifs.size());
-    emptyTextView.setVisibility(adapter == null || adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
   }
 
   @Override public void showGifRating(final String gifId, final int newRating) {
