@@ -20,11 +20,13 @@ import retrofit2.Response;
 public class LoadGifsJob extends UseCase<LoadGifsJob.RequestValues, LoadGifsJob.ResponseValue> {
   private final Box<RatedGif> gifsBox;
   private String apiKey;
+  private long addedTimestamp;
 
   public LoadGifsJob(RequestValues requestValues, String apiKey, Box<RatedGif> gifsBox, UseCaseCallback<ResponseValue> useCaseCallback, Params params) {
     super(requestValues, useCaseCallback, params);
     this.apiKey = apiKey;
     this.gifsBox = gifsBox;
+    addedTimestamp = System.currentTimeMillis();
   }
 
   @Override protected void executeUseCase(RequestValues requestValues) throws Throwable {
@@ -63,7 +65,7 @@ public class LoadGifsJob extends UseCase<LoadGifsJob.RequestValues, LoadGifsJob.
         }
       }
 
-      onSuccess(new ResponseValue(gifs));
+      onSuccess(new ResponseValue(gifs, addedTimestamp));
     } else {
       onError();
     }
@@ -112,9 +114,15 @@ public class LoadGifsJob extends UseCase<LoadGifsJob.RequestValues, LoadGifsJob.
   public static final class ResponseValue implements UseCase.ResponseValue {
 
     private final List<Gif> gifs;
+    private long addedTimestamp;
 
-    public ResponseValue(List<Gif> gifs) {
+    public ResponseValue(List<Gif> gifs, long addedTimestamp) {
       this.gifs = gifs;
+      this.addedTimestamp = addedTimestamp;
+    }
+
+    public long getAddedTimestamp() {
+      return addedTimestamp;
     }
 
     public List<Gif> getGifs() {

@@ -3,6 +3,7 @@ package com.olgefilimonov.gifer.mvp;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import com.birbit.android.jobqueue.Job;
 import com.birbit.android.jobqueue.Params;
 import com.birbit.android.jobqueue.RetryConstraint;
@@ -16,10 +17,9 @@ import javax.inject.Inject;
  * @author Oleg Filimonov
  */
 public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase.ResponseValue> extends Job {
-  private static final String TAG = "JOB";
-  protected Q requestValues;
   @Inject protected DefaultApi defaultApi;
   private UseCaseCallback<P> useCaseCallback;
+  private Q requestValues;
   private Handler handler;
 
   protected UseCase(Q requestValues, UseCaseCallback<P> useCaseCallback, Params params) {
@@ -30,32 +30,20 @@ public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase
     GiferApplication.getInstance().getComponent().inject((UseCase<RequestValues, ResponseValue>) this);
   }
 
-  @Override public void onAdded() {
-
-  }
-
-  @Override public void onRun() throws Throwable {
-    executeUseCase(requestValues);
-  }
-
-  @Override protected RetryConstraint shouldReRunOnThrowable(@NonNull Throwable throwable, int runCount, int maxRunCount) {
-
-    // TODO: 14-Jul-17 Put some logic here to retry if we got 500
-
-    // Cancel
-    return RetryConstraint.CANCEL;
-  }
-
   /**
    * Should be executed when usecase has completed successfully
    * This replaces thread pool scheduler to execute callbacks on the main thread
    */
   protected void onSuccess(final P response) {
-    handler.post(new Runnable() {
-      @Override public void run() {
-        useCaseCallback.onSuccess(response);
-      }
-    });
+    if (isCancelled()) {
+      Log.d("USECASE", "onSuccess: cancelled");
+    } else {
+      handler.post(new Runnable() {
+        @Override public void run() {
+          useCaseCallback.onSuccess(response);
+        }
+      });
+    }
   }
 
   protected void onError() {
@@ -64,6 +52,22 @@ public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase
         useCaseCallback.onError();
       }
     });
+  }
+
+  @Override public void onRun() throws Throwable {
+    executeUseCase(requestValues);
+  }
+
+  @Override public void onAdded() {
+
+  }
+
+  @Override protected RetryConstraint shouldReRunOnThrowable(@NonNull Throwable throwable, int runCount, int maxRunCount) {
+
+    // TODO: 14-Jul-17 Put some logic here to retry if we got 500
+
+    // Cancel
+    return RetryConstraint.CANCEL;
   }
 
   protected abstract void executeUseCase(Q requestValues) throws Throwable;

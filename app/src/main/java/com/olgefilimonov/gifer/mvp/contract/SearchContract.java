@@ -1,4 +1,4 @@
-package com.olgefilimonov.gifer.contract;
+package com.olgefilimonov.gifer.mvp.contract;
 
 import com.olgefilimonov.gifer.model.Gif;
 import com.olgefilimonov.gifer.mvp.BasePresenter;

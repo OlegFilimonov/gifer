@@ -2,9 +2,9 @@ package com.olgefilimonov.gifer.presenter;
 
 import com.birbit.android.jobqueue.JobManager;
 import com.birbit.android.jobqueue.Params;
-import com.olgefilimonov.gifer.contract.GifDetailContract;
 import com.olgefilimonov.gifer.model.RatedGif;
 import com.olgefilimonov.gifer.mvp.UseCase;
+import com.olgefilimonov.gifer.mvp.contract.GifDetailContract;
 import com.olgefilimonov.gifer.singleton.Constant;
 import com.olgefilimonov.gifer.singleton.GiferApplication;
 import com.olgefilimonov.gifer.usecase.CheckGifRatingJob;
@@ -26,7 +26,6 @@ public class GifDetailPresenter implements GifDetailContract.Presenter {
   public GifDetailPresenter(GifDetailContract.View view) {
     this.view = view;
     GiferApplication.getInstance().getComponent().inject(this);
-    view.setPresenter(this);
   }
 
   @Override public void updateGifRating(String gifId) {

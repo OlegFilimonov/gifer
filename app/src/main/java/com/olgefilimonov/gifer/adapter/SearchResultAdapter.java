@@ -64,7 +64,6 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         searchAdapterListener.onItemRated(gif, 1);
       }
     });
-
     holder.dislike.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
         searchAdapterListener.onItemRated(gif, -1);
