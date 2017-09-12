@@ -5,17 +5,18 @@ An Android app made to provide an example of my code style. This repo is mainly 
 
 # Architecture
 
-Architecture is based on Clean and MVP pattern. Heavily Inspired by [Android Architecture Blueprints](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/). 
+Architecture is based on Clean pattern. Inspired by [Android Architecture Blueprints](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/). 
 
 # Libraries
 
 Libraries used in this project:
 
+ - [Project Lombok](https://projectlombok.org/)
+ - [Gradle Retrolambda](https://github.com/evant/gradle-retrolambda)
  - [Retrofit](http://square.github.io/retrofit/)
  - [RxAndroid](https://github.com/ReactiveX/RxAndroid)
  - [Picasso](http://square.github.io/picasso/)
  - [Butterknife](http://jakewharton.github.io/butterknife/)
- - [Conductor](https://github.com/bluelinelabs/Conductor)
  - [Dagger 2](https://google.github.io/dagger/)
  - [ObjectBox](https://github.com/greenrobot/ObjectBox)
  - [Android Priority JobQueue](https://github.com/yigit/android-priority-jobqueue)
