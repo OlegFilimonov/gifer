@@ -2,8 +2,10 @@ package com.olgefilimonov.gifer.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import lombok.Getter;
+import lombok.Setter;
 
-public class Pagination {
+@Getter @Setter public class Pagination {
 
   @SerializedName("total_count") @Expose private Integer totalCount;
   @SerializedName("count") @Expose private Integer count;

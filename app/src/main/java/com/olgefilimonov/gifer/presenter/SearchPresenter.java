@@ -12,12 +12,12 @@ import com.olgefilimonov.gifer.singleton.GiferApplication;
 import com.olgefilimonov.gifer.usecase.CheckGifRatingJob;
 import com.olgefilimonov.gifer.usecase.LoadGifsJob;
 import com.olgefilimonov.gifer.usecase.RateGifJob;
-import io.objectbox.Box;
 import io.objectbox.BoxStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.inject.Inject;
+import lombok.val;
 
 /**
  * @author Oleg Filimonov
@@ -52,7 +52,7 @@ public class SearchPresenter implements SearchContract.Presenter {
     // Cancel all previous jobs
     jobManager.cancelJobsInBackground(null, TagConstraint.ALL, loadGifsTag);
 
-    UseCase.UseCaseCallback<LoadGifsJob.ResponseValue> useCaseCallback = new UseCase.UseCaseCallback<LoadGifsJob.ResponseValue>() {
+    val callback = new UseCase.UseCaseCallback<LoadGifsJob.ResponseValue>() {
       @Override public void onSuccess(LoadGifsJob.ResponseValue response) {
         view.hideProgress();
 
@@ -73,18 +73,18 @@ public class SearchPresenter implements SearchContract.Presenter {
       }
     };
 
-    LoadGifsJob.RequestValues requestValues = new LoadGifsJob.RequestValues(query, skip, limit);
-    Params params = new Params(Constant.DEFAULT_PRIORITY).addTags(presenterTag, loadGifsTag);
-    Box<RatedGif> gifsBox = boxStore.boxFor(RatedGif.class);
+    val requestValues = new LoadGifsJob.RequestValues(query, skip, limit);
+    val params = new Params(Constant.DEFAULT_PRIORITY).addTags(presenterTag, loadGifsTag);
+    val gifsBox = boxStore.boxFor(RatedGif.class);
 
-    LoadGifsJob job = new LoadGifsJob(requestValues, Constant.GIPHER_API_KEY, gifsBox, useCaseCallback, params);
+    val job = new LoadGifsJob(requestValues, Constant.GIPHER_API_KEY, gifsBox, callback, params);
 
     jobManager.addJobInBackground(job);
   }
 
   @Override public void updateGifRating(String gifId) {
-    CheckGifRatingJob.RequestValues requestValues = new CheckGifRatingJob.RequestValues(gifId);
-    CheckGifRatingJob job = new CheckGifRatingJob(requestValues, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
+    val requestValues = new CheckGifRatingJob.RequestValues(gifId);
+    val job = new CheckGifRatingJob(requestValues, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
       @Override public void onSuccess(CheckGifRatingJob.ResponseValues response) {
         view.showGifRating(response.getGifId(), response.getNewRating());
       }

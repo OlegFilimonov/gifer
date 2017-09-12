@@ -15,7 +15,7 @@ public class Constant {
   public static final String GIPHER_API_KEY = "7ef43d1e15c745b88ee7c9b7503c2f36";
 
   /* NETWORKING */
-  public static final String BASE_URL = "https://api.giphy.com";
+  public static final String BASE_URL = "https://api.giphy.com/";
   public static final String API_V1 = "/v1/";
 
   /* SEARCH */

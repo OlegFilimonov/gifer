@@ -12,18 +12,16 @@ import butterknife.OnClick;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.LoopingMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.olgefilimonov.gifer.R;
 import com.olgefilimonov.gifer.mvp.contract.GifDetailContract;
 import com.olgefilimonov.gifer.presenter.GifDetailPresenter;
+import lombok.val;
 
 /**
  * @author Oleg Filimonov
@@ -41,7 +39,7 @@ public class GifDetailActivity extends BaseActivity<GifDetailContract.Presenter>
   private String gifId;
 
   public static void start(Context context, String videoUrl, String gifId) {
-    Intent intent = new Intent(context, GifDetailActivity.class);
+    val intent = new Intent(context, GifDetailActivity.class);
     intent.putExtra(GIF_DETAIL_VIDEO_URL, videoUrl);
     intent.putExtra(GIF_DETAIL_GIF_ID, gifId);
     context.startActivity(intent);
@@ -68,10 +66,10 @@ public class GifDetailActivity extends BaseActivity<GifDetailContract.Presenter>
     final SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(this, new DefaultTrackSelector());
 
     exoPlayerView.setPlayer(player);
-    DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, getString(R.string.app_name)), null);
-    ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-    MediaSource videoSource = new ExtractorMediaSource(Uri.parse(videoUrl), dataSourceFactory, extractorsFactory, null, null);
-    LoopingMediaSource loopingSource = new LoopingMediaSource(videoSource);
+    val dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, getString(R.string.app_name)), null);
+    val extractorsFactory = new DefaultExtractorsFactory();
+    val videoSource = new ExtractorMediaSource(Uri.parse(videoUrl), dataSourceFactory, extractorsFactory, null, null);
+    val loopingSource = new LoopingMediaSource(videoSource);
     player.setPlayWhenReady(true);
     player.prepare(loopingSource);
   }

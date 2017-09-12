@@ -5,7 +5,10 @@ import com.birbit.android.jobqueue.Params;
 import com.olgefilimonov.gifer.model.RatedGif;
 import com.olgefilimonov.gifer.mvp.UseCase;
 import io.objectbox.Box;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.val;
 
 /**
  * @author Oleg Filimonov
@@ -21,10 +24,10 @@ public class CheckGifRatingJob extends UseCase<CheckGifRatingJob.RequestValues, 
 
   @Override protected void executeUseCase(RequestValues requestValues) throws Throwable {
 
-    String gifId = requestValues.getGifId();
+    val gifId = requestValues.getGifId();
 
     RatedGif ratedGif;
-    List<RatedGif> ratedGifList = gifsBox.find("gifId", gifId);
+    val ratedGifList = gifsBox.find("gifId", gifId);
     if (ratedGifList.size() == 0) {
       // No rating found
       ratedGif = new RatedGif();
@@ -44,45 +47,12 @@ public class CheckGifRatingJob extends UseCase<CheckGifRatingJob.RequestValues, 
     onError();
   }
 
-  public static final class RequestValues implements UseCase.RequestValues {
+  @Getter @Setter @AllArgsConstructor public static final class RequestValues implements UseCase.RequestValues {
     private String gifId;
-
-    public RequestValues(String gifId) {
-      this.gifId = gifId;
-    }
-
-    public String getGifId() {
-      return gifId;
-    }
-
-    public void setGifId(String gifId) {
-      this.gifId = gifId;
-    }
   }
 
-  public static final class ResponseValues implements UseCase.ResponseValue {
+  @Getter @Setter @AllArgsConstructor public static final class ResponseValues implements UseCase.ResponseValue {
     private String gifId;
     private int newRating;
-
-    public ResponseValues(String gifId, int newRating) {
-      this.gifId = gifId;
-      this.newRating = newRating;
-    }
-
-    public String getGifId() {
-      return gifId;
-    }
-
-    public void setGifId(String gifId) {
-      this.gifId = gifId;
-    }
-
-    public int getNewRating() {
-      return newRating;
-    }
-
-    public void setNewRating(int newRating) {
-      this.newRating = newRating;
-    }
   }
 }

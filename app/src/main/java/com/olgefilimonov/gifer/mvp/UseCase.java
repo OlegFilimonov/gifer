@@ -8,6 +8,7 @@ import com.birbit.android.jobqueue.Job;
 import com.birbit.android.jobqueue.Params;
 import com.birbit.android.jobqueue.RetryConstraint;
 import com.olgefilimonov.gifer.client.DefaultApi;
+import com.olgefilimonov.gifer.singleton.Constant;
 import com.olgefilimonov.gifer.singleton.GiferApplication;
 import javax.inject.Inject;
 
@@ -31,12 +32,12 @@ public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase
   }
 
   /**
-   * Should be executed when usecase has completed successfully
+   * Executed when usecase has completed successfully or if job was cancelled in the progress
    * This replaces thread pool scheduler to execute callbacks on the main thread
    */
   protected void onSuccess(final P response) {
     if (isCancelled()) {
-      Log.d("USECASE", "onSuccess: cancelled");
+      if (Constant.DEBUG) Log.d("USECASE", "onSuccess: cancelled");
     } else {
       handler.post(new Runnable() {
         @Override public void run() {

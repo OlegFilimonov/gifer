@@ -14,6 +14,7 @@ import com.olgefilimonov.gifer.R;
 import com.olgefilimonov.gifer.model.Gif;
 import com.squareup.picasso.Picasso;
 import java.util.List;
+import lombok.val;
 
 /**
  * @author Oleg Filimonov
@@ -32,7 +33,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
 
   public void updateGifRating(String gifId, int newRating) {
     for (int i = 0; i < gifs.size(); i++) {
-      Gif gif = gifs.get(i);
+      val gif = gifs.get(i);
       if (gif.getGifId().equals(gifId)) {
         gif.setScore(newRating);
         notifyItemChanged(i);
@@ -42,12 +43,12 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
   }
 
   @Override public SearchResultViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-    View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_gif, parent, false);
+    val view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_gif, parent, false);
     return new SearchResultViewHolder(view);
   }
 
   @Override public void onBindViewHolder(final SearchResultViewHolder holder, int position) {
-    final Gif gif = gifs.get(position);
+    val gif = gifs.get(position);
 
     // Load preview image
     Picasso.with(activity).load(gif.getPreviewUrl()).fit().centerCrop().into(holder.image);

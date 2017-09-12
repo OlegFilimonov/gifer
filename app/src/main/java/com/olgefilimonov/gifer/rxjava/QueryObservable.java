@@ -4,6 +4,7 @@ import com.arlib.floatingsearchview.FloatingSearchView;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.MainThreadDisposable;
+import lombok.val;
 
 final public class QueryObservable extends Observable<CharSequence> {
 
@@ -22,7 +23,7 @@ final public class QueryObservable extends Observable<CharSequence> {
 
   @Override protected void subscribeActual(Observer<? super CharSequence> observer) {
 
-    Listener listener = new Listener(view, observer, minQueryLength);
+    val listener = new Listener(view, observer, minQueryLength);
     observer.onSubscribe(listener);
     view.setOnQueryChangeListener(listener);
   }

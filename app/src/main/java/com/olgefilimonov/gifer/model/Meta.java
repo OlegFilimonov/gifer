@@ -2,8 +2,10 @@ package com.olgefilimonov.gifer.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import lombok.Getter;
+import lombok.Setter;
 
-public class Meta {
+@Getter @Setter public class Meta {
 
   @SerializedName("status") @Expose private Integer status;
   @SerializedName("msg") @Expose private String msg;

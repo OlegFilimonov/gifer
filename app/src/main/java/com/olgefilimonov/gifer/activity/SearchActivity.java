@@ -23,6 +23,7 @@ import com.olgefilimonov.gifer.singleton.Constant;
 import io.reactivex.functions.Consumer;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.val;
 
 /**
  * @author Oleg Filimonov
@@ -76,7 +77,7 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
 
   private void setupRecyclerView() {
 
-    GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+    val layoutManager = new GridLayoutManager(this, 2);
     endlessListener = new EndlessRecyclerGridOnScrollListener(layoutManager) {
       @Override public void onLoadMore(int current_page) {
         loadNextDataFromApi(current_page);
@@ -102,7 +103,7 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
         super.onScrollStateChanged(recyclerView, newState);
 
         // Hide keyboard
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        val imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
       }
     });
@@ -162,6 +163,6 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
   }
 
   @Override public void showError() {
-    Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show();
+    Toast.makeText(this, R.string.general_error, Toast.LENGTH_SHORT).show();
   }
 }

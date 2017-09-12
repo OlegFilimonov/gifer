@@ -12,6 +12,7 @@ import com.olgefilimonov.gifer.usecase.RateGifJob;
 import io.objectbox.BoxStore;
 import java.util.UUID;
 import javax.inject.Inject;
+import lombok.val;
 
 /**
  * @author Oleg Filimonov
@@ -29,8 +30,8 @@ public class GifDetailPresenter implements GifDetailContract.Presenter {
   }
 
   @Override public void updateGifRating(String gifId) {
-    CheckGifRatingJob.RequestValues requestValues = new CheckGifRatingJob.RequestValues(gifId);
-    CheckGifRatingJob job = new CheckGifRatingJob(requestValues, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
+    val requestValues = new CheckGifRatingJob.RequestValues(gifId);
+    val job = new CheckGifRatingJob(requestValues, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
       @Override public void onSuccess(CheckGifRatingJob.ResponseValues response) {
         view.showGifRating(response.getNewRating());
       }
@@ -43,8 +44,8 @@ public class GifDetailPresenter implements GifDetailContract.Presenter {
   }
 
   @Override public void rateGif(String gifId, int rating) {
-    RateGifJob.RequestValues requestValues = new RateGifJob.RequestValues(gifId, rating);
-    UseCase.UseCaseCallback<RateGifJob.ResponseValues> useCaseCallback = new UseCase.UseCaseCallback<RateGifJob.ResponseValues>() {
+    val requestValues = new RateGifJob.RequestValues(gifId, rating);
+    val useCaseCallback = new UseCase.UseCaseCallback<RateGifJob.ResponseValues>() {
       @Override public void onSuccess(RateGifJob.ResponseValues response) {
         view.showGifRating(response.getNewRating());
       }
@@ -53,7 +54,7 @@ public class GifDetailPresenter implements GifDetailContract.Presenter {
         view.showError();
       }
     };
-    RateGifJob job = new RateGifJob(requestValues, boxStore.boxFor(RatedGif.class), useCaseCallback, new Params(Constant.DEFAULT_PRIORITY).addTags(tag));
+    val job = new RateGifJob(requestValues, boxStore.boxFor(RatedGif.class), useCaseCallback, new Params(Constant.DEFAULT_PRIORITY).addTags(tag));
     jobManager.addJobInBackground(job);
   }
 }
