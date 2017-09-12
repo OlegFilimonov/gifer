@@ -27,4 +27,3 @@ Other libraries I use that weren't utilized in this project:
  - [Calligraphy](https://github.com/chrisjenx/Calligraphy)
  - [Dexter](https://github.com/Karumi/Dexter)
  - [LeakCanary](https://github.com/square/leakcanary)
- - [EventBus](https://github.com/greenrobot/EventBus)
