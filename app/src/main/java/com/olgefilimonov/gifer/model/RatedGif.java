@@ -4,14 +4,11 @@ import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Generated;
 import io.objectbox.annotation.Id;
 import io.objectbox.annotation.apihint.Internal;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * @author Oleg Filimonov
  */
-
-@Getter @Setter @Entity public class RatedGif {
+@Entity public class RatedGif {
   @Id private long id;
   private String gifId;
   private int score;
