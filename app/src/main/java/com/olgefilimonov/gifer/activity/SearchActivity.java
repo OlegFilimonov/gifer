@@ -1,13 +1,11 @@
 package com.olgefilimonov.gifer.activity;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.BindView;
@@ -23,6 +21,8 @@ import com.olgefilimonov.gifer.singleton.Constant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.val;
+
+import static com.olgefilimonov.gifer.singleton.Utils.hideKeyboard;
 
 /**
  * @author Oleg Filimonov
@@ -87,6 +87,7 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
       }
 
       @Override public void onItemClick(Gif gif) {
+        hideKeyboard(SearchActivity.this, searchResultsRecyclerView);
         // Save gif id to update it later
         clickedGifId = gif.getGifId();
         GifDetailActivity.start(SearchActivity.this, gif.getVideoUrl(), gif.getGifId());
@@ -99,8 +100,7 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
     searchResultsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
       @Override public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
         // Hide keyboard
-        val imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
+        hideKeyboard(SearchActivity.this, recyclerView);
       }
     });
   }
@@ -147,7 +147,16 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
   }
 
   @Override public void showGifRating(final String gifId, final int newRating) {
-    adapter.updateGifRating(gifId, newRating);
+    //adapter.updateGifRating(gifId, newRating);
+
+    for (int i = 0; i < gifs.size(); i++) {
+      val gif = gifs.get(i);
+      if (gif.getGifId().equals(gifId)) {
+        gif.setScore(newRating);
+        ((SearchResultAdapter.SearchResultViewHolder) searchResultsRecyclerView.findViewHolderForAdapterPosition(i)).updateRating(newRating);
+        return;
+      }
+    }
   }
 
   @Override public void showProgress() {

@@ -31,17 +31,6 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     this.searchAdapterListener = searchAdapterListener;
   }
 
-  public void updateGifRating(String gifId, int newRating) {
-    for (int i = 0; i < gifs.size(); i++) {
-      val gif = gifs.get(i);
-      if (gif.getGifId().equals(gifId)) {
-        gif.setScore(newRating);
-        notifyItemChanged(i);
-        return;
-      }
-    }
-  }
-
   @Override public SearchResultViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     val view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_gif, parent, false);
     return new SearchResultViewHolder(view);
@@ -70,7 +59,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     void onItemClick(Gif gif);
   }
 
-  class SearchResultViewHolder extends RecyclerView.ViewHolder {
+  public class SearchResultViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.gif_card) CardView card;
     @BindView(R.id.gif_image) ImageView image;
     @BindView(R.id.gif_like) ImageView like;
@@ -80,6 +69,10 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     SearchResultViewHolder(View itemView) {
       super(itemView);
       ButterKnife.bind(this, itemView);
+    }
+
+    public void updateRating(int newRating) {
+      score.setText(String.valueOf(newRating));
     }
   }
 }
