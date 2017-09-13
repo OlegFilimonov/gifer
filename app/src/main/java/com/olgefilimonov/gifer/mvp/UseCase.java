@@ -39,20 +39,12 @@ public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase
     if (isCancelled()) {
       if (Constant.DEBUG) Log.d("USECASE", "onSuccess: cancelled");
     } else {
-      handler.post(new Runnable() {
-        @Override public void run() {
-          useCaseCallback.onSuccess(response);
-        }
-      });
+      handler.post(() -> useCaseCallback.onSuccess(response));
     }
   }
 
   protected void onError() {
-    handler.post(new Runnable() {
-      @Override public void run() {
-        useCaseCallback.onError();
-      }
-    });
+    handler.post(() -> useCaseCallback.onError());
   }
 
   @Override public void onRun() throws Throwable {

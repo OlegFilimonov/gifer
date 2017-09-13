@@ -1,7 +1,9 @@
 <resources>
   <string name="app_name">Gifer</string>
-  <string name="title_activity_gif_detail">GifDetailActivity</string>
   <string name="search_empty">Hi. Try searching for something.\nIt\'s kinda the only thing this app can do.</string>
   <string name="search_no_results">No results for \"%s\"</string>
   <string name="general_error">Error!</string>
+  <string name="like_gif">Like gif</string>
+  <string name="dislike_gif">Dislike gif</string>
+  <string name="gif_image_preview">Gif image preview</string>
 </resources>

@@ -62,14 +62,15 @@ public class GifDetailActivity extends BaseActivity<GifDetailContract.Presenter>
   }
 
   private void setupExoPlayer() {
-
     final SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(this, new DefaultTrackSelector());
 
     exoPlayerView.setPlayer(player);
+
     val dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, getString(R.string.app_name)), null);
     val extractorsFactory = new DefaultExtractorsFactory();
     val videoSource = new ExtractorMediaSource(Uri.parse(videoUrl), dataSourceFactory, extractorsFactory, null, null);
     val loopingSource = new LoopingMediaSource(videoSource);
+
     player.setPlayWhenReady(true);
     player.prepare(loopingSource);
   }

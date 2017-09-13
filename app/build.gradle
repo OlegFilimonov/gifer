@@ -22,7 +22,7 @@ android {
   def versionPatch = 0
   def versionBuild = 1
   compileSdkVersion 26
-  buildToolsVersion "26.0.0"
+  buildToolsVersion "26.0.1"
   defaultConfig {
     applicationId "com.olegfilimonov.gifer"
     minSdkVersion 15
@@ -53,6 +53,10 @@ android {
       debuggable true
       jniDebuggable true
       proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+    }
+    compileOptions {
+      sourceCompatibility JavaVersion.VERSION_1_8
+      targetCompatibility JavaVersion.VERSION_1_8
     }
   }
   applicationVariants.all { variant -> variant.resValue "string", "versionName", variant.versionName

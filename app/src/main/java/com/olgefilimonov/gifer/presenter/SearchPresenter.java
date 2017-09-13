@@ -28,7 +28,6 @@ public class SearchPresenter implements SearchContract.Presenter {
    * A tag that is unique to this presenter instance. Can be used to cancel all jobs of the presenter at once
    */
   private final String presenterTag = UUID.randomUUID().toString();
-  private final String loadGifsTag = "load_gifs";
   @Inject JobManager jobManager;
   @Inject BoxStore boxStore;
   private SearchContract.View view;
@@ -50,6 +49,7 @@ public class SearchPresenter implements SearchContract.Presenter {
     }
 
     // Cancel all previous jobs
+    String loadGifsTag = "load_gifs";
     jobManager.cancelJobsInBackground(null, TagConstraint.ALL, loadGifsTag);
 
     val callback = new UseCase.UseCaseCallback<LoadGifsJob.ResponseValue>() {

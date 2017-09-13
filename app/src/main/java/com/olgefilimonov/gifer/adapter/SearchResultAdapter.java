@@ -53,23 +53,11 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     // Load preview image
     Picasso.with(activity).load(gif.getPreviewUrl()).fit().centerCrop().into(holder.image);
     // Setup click
-    holder.card.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View view) {
-        searchAdapterListener.onItemClick(gif);
-      }
-    });
+    holder.card.setOnClickListener(view -> searchAdapterListener.onItemClick(gif));
     holder.score.setText(String.valueOf(gif.getScore()));
     // Likes & Dislike click
-    holder.like.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View view) {
-        searchAdapterListener.onItemRated(gif, 1);
-      }
-    });
-    holder.dislike.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View view) {
-        searchAdapterListener.onItemRated(gif, -1);
-      }
-    });
+    holder.like.setOnClickListener(view -> searchAdapterListener.onItemRated(gif, 1));
+    holder.dislike.setOnClickListener(view -> searchAdapterListener.onItemRated(gif, -1));
   }
 
   @Override public int getItemCount() {

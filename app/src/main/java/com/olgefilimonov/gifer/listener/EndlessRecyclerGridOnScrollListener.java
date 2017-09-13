@@ -9,7 +9,6 @@ public abstract class EndlessRecyclerGridOnScrollListener extends RecyclerView.O
   int firstVisibleItem, visibleItemCount, totalItemCount;
   private int previousTotal = 0;
   private boolean loading = true;
-  private int visibleThreshold = Constant.VISIBLE_TRESHHOLD; // The minimum amount of items to have below your current scroll position before loading more.
 
   private int current_page = 1;
 
@@ -32,6 +31,7 @@ public abstract class EndlessRecyclerGridOnScrollListener extends RecyclerView.O
         previousTotal = totalItemCount;
       }
     }
+    int visibleThreshold = Constant.VISIBLE_TRESHHOLD;
     if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
       // End has been reached
 

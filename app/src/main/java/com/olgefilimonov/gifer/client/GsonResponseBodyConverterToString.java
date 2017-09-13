@@ -1,5 +1,6 @@
 package com.olgefilimonov.gifer.client;
 
+import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class GsonResponseBodyConverterToString<T> implements Converter<ResponseB
     this.type = type;
   }
 
-  @Override public T convert(ResponseBody value) throws IOException {
+  @Override public T convert(@NonNull ResponseBody value) throws IOException {
     String returned = value.string();
     try {
       return gson.fromJson(returned, type);

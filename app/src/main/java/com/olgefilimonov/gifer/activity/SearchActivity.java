@@ -20,7 +20,6 @@ import com.olgefilimonov.gifer.mvp.contract.SearchContract;
 import com.olgefilimonov.gifer.presenter.SearchPresenter;
 import com.olgefilimonov.gifer.rxjava.RxFloatingSearchView;
 import com.olgefilimonov.gifer.singleton.Constant;
-import io.reactivex.functions.Consumer;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.val;
@@ -61,17 +60,16 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
       presenter.updateGifRating(clickedGifId);
       clickedGifId = null;
     }
+
     updateEmptyText();
   }
 
   private void setupSearch() {
-    RxFloatingSearchView.queryChanges(floatingSearchView).doOnNext(new Consumer<CharSequence>() {
-      @Override public void accept(@io.reactivex.annotations.NonNull CharSequence charSequence) throws Exception {
-        clearSearchResults();
-        // Save query for the endless endlessListener
-        query = charSequence.toString();
-        presenter.loadGifs(query, skip, Constant.SEARCH_LIMIT);
-      }
+    RxFloatingSearchView.queryChanges(floatingSearchView).doOnNext(charSequence -> {
+      clearSearchResults();
+      // Save query for the endless endlessListener
+      query = charSequence.toString();
+      presenter.loadGifs(query, skip, Constant.SEARCH_LIMIT);
     }).subscribe();
   }
 
@@ -100,8 +98,6 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
     searchResultsRecyclerView.addOnScrollListener(endlessListener);
     searchResultsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
       @Override public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-        super.onScrollStateChanged(recyclerView, newState);
-
         // Hide keyboard
         val imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
