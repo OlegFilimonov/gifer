@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.BindView;
@@ -21,7 +22,10 @@ import com.google.android.exoplayer2.util.Util;
 import com.olgefilimonov.gifer.R;
 import com.olgefilimonov.gifer.mvp.contract.GifDetailContract;
 import com.olgefilimonov.gifer.presenter.GifDetailPresenter;
+import icepick.State;
 import lombok.val;
+
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 /**
  * @author Oleg Filimonov
@@ -34,7 +38,7 @@ public class GifDetailActivity extends BaseActivity<GifDetailContract.Presenter>
 
   @BindView(R.id.exoplayer) SimpleExoPlayerView exoPlayerView;
   @BindView(R.id.gif_score) TextView scoreView;
-
+  @State long playerPosition;
   private String videoUrl;
   private String gifId;
 
@@ -52,6 +56,7 @@ public class GifDetailActivity extends BaseActivity<GifDetailContract.Presenter>
 
     setupData();
     setupExoPlayer();
+
     presenter.updateGifRating(gifId);
   }
 
@@ -73,6 +78,22 @@ public class GifDetailActivity extends BaseActivity<GifDetailContract.Presenter>
 
     player.setPlayWhenReady(true);
     player.prepare(loopingSource);
+    player.seekTo(playerPosition);
+
+    if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
+      getWindow().getDecorView()
+          .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+              | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+              | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+              | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+              | View.SYSTEM_UI_FLAG_FULLSCREEN
+              | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
+  }
+
+  @Override public void onSaveInstanceState(Bundle outState) {
+    playerPosition = exoPlayerView.getPlayer().getCurrentPosition();
+    super.onSaveInstanceState(outState);
   }
 
   @OnClick(R.id.gif_like) void onGifLike() {

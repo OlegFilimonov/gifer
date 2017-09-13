@@ -8,6 +8,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import com.olgefilimonov.gifer.mvp.BasePresenter;
 import com.olgefilimonov.gifer.mvp.BaseView;
+import icepick.Icepick;
 
 /**
  * @author not Oleg Filimonov
@@ -23,6 +24,12 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
 
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    Icepick.restoreInstanceState(this, savedInstanceState);
+  }
+
+  @Override public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    Icepick.saveInstanceState(this, outState);
   }
 
   @Override public void setContentView(@LayoutRes int layoutResID) {
