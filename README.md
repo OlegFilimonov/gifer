@@ -12,6 +12,7 @@ Architecture is based on Clean pattern. Inspired by [Android Architecture Bluepr
 Libraries used in this project:
 
  - [Project Lombok](https://projectlombok.org/)
+ - [IcePick](https://github.com/frankiesardo/icepick)
  - [Gradle Retrolambda](https://github.com/evant/gradle-retrolambda)
  - [Retrofit](http://square.github.io/retrofit/)
  - [RxAndroid](https://github.com/ReactiveX/RxAndroid)
@@ -20,6 +21,7 @@ Libraries used in this project:
  - [Dagger 2](https://google.github.io/dagger/)
  - [ObjectBox](https://github.com/greenrobot/ObjectBox)
  - [Android Priority JobQueue](https://github.com/yigit/android-priority-jobqueue)
+
 
 Other libraries I use that weren't utilized in this project:
 
