@@ -19,7 +19,7 @@ android {
   // Version
   def versionMajor = 1
   def versionMinor = 0
-  def versionPatch = 0
+  def versionPatch = 1
   def versionBuild = 1
   compileSdkVersion 26
   buildToolsVersion "26.0.1"
@@ -122,6 +122,8 @@ dependencies {
 
   compile 'frankiesardo:icepick:3.1.0'
   provided 'frankiesardo:icepick-processor:3.1.0'
+
+  compile 'com.koushikdutta.ion:ion:2.+'
 
   testCompile "junit:junit:4.12"
   annotationProcessor "com.jakewharton:butterknife-compiler:8.7.0"

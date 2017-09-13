@@ -10,9 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.koushikdutta.ion.Ion;
 import com.olgefilimonov.gifer.R;
 import com.olgefilimonov.gifer.model.Gif;
-import com.squareup.picasso.Picasso;
 import java.util.List;
 import lombok.val;
 
@@ -40,7 +40,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     val gif = gifs.get(position);
 
     // Load preview image
-    Picasso.with(activity).load(gif.getPreviewUrl()).fit().centerCrop().into(holder.image);
+    Ion.with(activity).load(gif.getPreviewUrl()).intoImageView(holder.image);
     // Setup click
     holder.card.setOnClickListener(view -> searchAdapterListener.onItemClick(gif));
     holder.score.setText(String.valueOf(gif.getScore()));

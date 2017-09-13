@@ -5,6 +5,7 @@ import com.birbit.android.jobqueue.Params;
 import com.olgefilimonov.gifer.model.Datum;
 import com.olgefilimonov.gifer.model.Gif;
 import com.olgefilimonov.gifer.model.GiphyResponse;
+import com.olgefilimonov.gifer.model.PreviewGif;
 import com.olgefilimonov.gifer.model.RatedGif;
 import com.olgefilimonov.gifer.mvp.UseCase;
 import io.objectbox.Box;
@@ -46,7 +47,8 @@ public class LoadGifsJob extends UseCase<LoadGifsJob.RequestValues, LoadGifsJob.
       val data = body != null ? body.getData() : null;
       if (data != null) {
         for (Datum datum : data) {
-          val previewUrl = datum.getImages().getDownsizedStill().getUrl();
+          PreviewGif previewGif = datum.getImages().getPreviewGif();
+          val previewUrl = previewGif == null ? datum.getImages().getDownsizedStill().getUrl() : previewGif.getUrl();
           // Sometimes original MP4 is unavailable. If so, don't add the gif
           if (datum.getImages().getOriginalMp4() == null) continue;
           val videoUrl = datum.getImages().getOriginalMp4().getMp4();
