@@ -22,7 +22,6 @@ Libraries used in this project:
  - [ObjectBox](https://github.com/greenrobot/ObjectBox)
  - [Android Priority JobQueue](https://github.com/yigit/android-priority-jobqueue)
 
-
 Other libraries I use that weren't utilized in this project:
 
  - [Glide](https://github.com/bumptech/glide)
