@@ -15,8 +15,8 @@ Libraries used in this project:
  - [IcePick](https://github.com/frankiesardo/icepick)
  - [Gradle Retrolambda](https://github.com/evant/gradle-retrolambda)
  - [Retrofit](http://square.github.io/retrofit/)
+ - [Ion](https://github.com/koush/ion)
  - [RxAndroid](https://github.com/ReactiveX/RxAndroid)
- - [Picasso](http://square.github.io/picasso/)
  - [Butterknife](http://jakewharton.github.io/butterknife/)
  - [Dagger 2](https://google.github.io/dagger/)
  - [ObjectBox](https://github.com/greenrobot/ObjectBox)
@@ -24,7 +24,6 @@ Libraries used in this project:
 
 Other libraries I use that weren't utilized in this project:
 
- - [Glide](https://github.com/bumptech/glide)
  - [Calligraphy](https://github.com/chrisjenx/Calligraphy)
  - [Dexter](https://github.com/Karumi/Dexter)
  - [LeakCanary](https://github.com/square/leakcanary)
