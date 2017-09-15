@@ -1,9 +1,8 @@
-package com.olgefilimonov.gifer.usecase;
+package com.olgefilimonov.gifer.job;
 
 import android.support.annotation.Nullable;
 import com.birbit.android.jobqueue.Params;
-import com.olgefilimonov.gifer.model.RatedGif;
-import com.olgefilimonov.gifer.mvp.UseCase;
+import com.olgefilimonov.gifer.entity.RatedGif;
 import io.objectbox.Box;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

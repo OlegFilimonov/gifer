@@ -1,4 +1,4 @@
-package com.olgefilimonov.gifer.client;
+package com.olgefilimonov.gifer.api;
 
 import android.support.annotation.NonNull;
 import com.google.gson.Gson;
@@ -13,11 +13,11 @@ import retrofit2.Converter;
  * when the deserialization fails due to JsonParseException and the
  * expected type is String, then just return the body string
  */
-public class GsonResponseBodyConverterToString<T> implements Converter<ResponseBody, T> {
+public class GsonResponseConverter<T> implements Converter<ResponseBody, T> {
   private final Gson gson;
   private final Type type;
 
-  GsonResponseBodyConverterToString(Gson gson, Type type) {
+  GsonResponseConverter(Gson gson, Type type) {
     this.gson = gson;
     this.type = type;
   }

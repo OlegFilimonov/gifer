@@ -1,4 +1,4 @@
-package com.olgefilimonov.gifer.activity;
+package com.olgefilimonov.gifer.view;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,7 +20,7 @@ import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.olgefilimonov.gifer.R;
-import com.olgefilimonov.gifer.mvp.contract.GifDetailContract;
+import com.olgefilimonov.gifer.contract.GifDetailContract;
 import com.olgefilimonov.gifer.presenter.GifDetailPresenter;
 import icepick.State;
 import lombok.val;

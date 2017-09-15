@@ -10,12 +10,12 @@ import com.olgefilimonov.gifer.dagger.DaggerAppComponent;
  * @author Oleg Filimonov
  */
 
-public class GiferApplication extends Application {
+public class App extends Application {
 
-  private static GiferApplication instance;
+  private static App instance;
   private AppComponent component;
 
-  public static synchronized GiferApplication getInstance() {
+  public static synchronized App getInstance() {
     return instance;
   }
 

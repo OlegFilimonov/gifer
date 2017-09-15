@@ -1,6 +1,6 @@
 package com.olgefilimonov.gifer.dagger;
 
-import com.olgefilimonov.gifer.mvp.UseCase;
+import com.olgefilimonov.gifer.job.UseCase;
 import com.olgefilimonov.gifer.presenter.GifDetailPresenter;
 import com.olgefilimonov.gifer.presenter.SearchPresenter;
 import dagger.Component;

@@ -3,7 +3,7 @@ package com.olgefilimonov.gifer.dagger;
 import android.content.Context;
 import com.birbit.android.jobqueue.JobManager;
 import com.birbit.android.jobqueue.config.Configuration;
-import com.olgefilimonov.gifer.model.MyObjectBox;
+import com.olgefilimonov.gifer.entity.MyObjectBox;
 import dagger.Module;
 import dagger.Provides;
 import io.objectbox.BoxStore;

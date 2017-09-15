@@ -2,7 +2,7 @@ package com.olgefilimonov.gifer.listener;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import com.olgefilimonov.gifer.singleton.Constant;
+import com.olgefilimonov.gifer.singleton.AppConfig;
 
 public abstract class EndlessRecyclerGridOnScrollListener extends RecyclerView.OnScrollListener {
   public static String TAG = EndlessRecyclerGridOnScrollListener.class.getSimpleName();
@@ -31,7 +31,7 @@ public abstract class EndlessRecyclerGridOnScrollListener extends RecyclerView.O
         previousTotal = totalItemCount;
       }
     }
-    int visibleThreshold = Constant.VISIBLE_TRESHHOLD;
+    int visibleThreshold = AppConfig.VISIBLE_TRESHHOLD;
     if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
       // End has been reached
 

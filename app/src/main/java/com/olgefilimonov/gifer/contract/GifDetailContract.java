@@ -1,7 +1,7 @@
-package com.olgefilimonov.gifer.mvp.contract;
+package com.olgefilimonov.gifer.contract;
 
-import com.olgefilimonov.gifer.mvp.BasePresenter;
-import com.olgefilimonov.gifer.mvp.BaseView;
+import com.olgefilimonov.gifer.presenter.BasePresenter;
+import com.olgefilimonov.gifer.view.BaseView;
 
 /**
  * @author Oleg Filimonov

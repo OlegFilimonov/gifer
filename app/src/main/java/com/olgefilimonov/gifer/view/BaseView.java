@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.olgefilimonov.gifer.mvp;
+package com.olgefilimonov.gifer.view;
+
+import com.olgefilimonov.gifer.presenter.BasePresenter;
 
 /**
  * @param <T> the presenter type

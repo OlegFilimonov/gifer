@@ -1,13 +1,12 @@
-package com.olgefilimonov.gifer.usecase;
+package com.olgefilimonov.gifer.job;
 
 import android.support.annotation.Nullable;
 import com.birbit.android.jobqueue.Params;
+import com.olgefilimonov.gifer.entity.Gif;
+import com.olgefilimonov.gifer.entity.RatedGif;
 import com.olgefilimonov.gifer.model.Datum;
-import com.olgefilimonov.gifer.model.Gif;
 import com.olgefilimonov.gifer.model.GiphyResponse;
 import com.olgefilimonov.gifer.model.PreviewGif;
-import com.olgefilimonov.gifer.model.RatedGif;
-import com.olgefilimonov.gifer.mvp.UseCase;
 import io.objectbox.Box;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ public class LoadGifsJob extends UseCase<LoadGifsJob.RequestValues, LoadGifsJob.
 
   @Override protected void executeUseCase(RequestValues requestValues) throws Throwable {
     // Get list of gifs
-    Call<GiphyResponse> call = defaultApi.searchGifs(apiKey, requestValues.getQuery(), requestValues.getLimit(), requestValues.getSkip());
+    Call<GiphyResponse> call = restApi.searchGifs(apiKey, requestValues.getQuery(), requestValues.getLimit(), requestValues.getSkip());
     Response<GiphyResponse> response = call.execute();
     if (response.isSuccessful()) {
 

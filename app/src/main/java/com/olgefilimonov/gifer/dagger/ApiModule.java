@@ -1,7 +1,7 @@
 package com.olgefilimonov.gifer.dagger;
 
-import com.olgefilimonov.gifer.client.ApiClient;
-import com.olgefilimonov.gifer.client.DefaultApi;
+import com.olgefilimonov.gifer.api.ApiClient;
+import com.olgefilimonov.gifer.api.RestApi;
 import dagger.Module;
 import dagger.Provides;
 import javax.inject.Singleton;
@@ -21,7 +21,7 @@ import javax.inject.Singleton;
     return new ApiClient();
   }
 
-  @Provides @Singleton DefaultApi provideDefaultApi(ApiClient apiClient) {
-    return apiClient.createService(DefaultApi.class);
+  @Provides @Singleton RestApi provideDefaultApi(ApiClient apiClient) {
+    return apiClient.createService(RestApi.class);
   }
 }

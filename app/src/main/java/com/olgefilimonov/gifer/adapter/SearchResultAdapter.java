@@ -12,7 +12,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.koushikdutta.ion.Ion;
 import com.olgefilimonov.gifer.R;
-import com.olgefilimonov.gifer.model.Gif;
+import com.olgefilimonov.gifer.entity.Gif;
 import java.util.List;
 import lombok.val;
 

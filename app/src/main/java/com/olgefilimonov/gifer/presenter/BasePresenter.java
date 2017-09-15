@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.olgefilimonov.gifer.mvp;
+package com.olgefilimonov.gifer.presenter;
 
 /**
  * @author Oleg Filimonov

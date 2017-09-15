@@ -1,4 +1,4 @@
-package com.olgefilimonov.gifer.model;
+package com.olgefilimonov.gifer.entity;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -54,10 +54,10 @@ android {
       jniDebuggable true
       proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
     }
-    compileOptions {
-      sourceCompatibility JavaVersion.VERSION_1_8
-      targetCompatibility JavaVersion.VERSION_1_8
-    }
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
   }
   applicationVariants.all { variant -> variant.resValue "string", "versionName", variant.versionName
   }
@@ -70,7 +70,7 @@ android {
       minSdkVersion 16
     }
     develop {
-      minSdkVersion 21
+      minSdkVersion 16
     }
   }
 }

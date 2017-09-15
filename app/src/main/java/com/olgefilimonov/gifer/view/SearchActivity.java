@@ -1,4 +1,4 @@
-package com.olgefilimonov.gifer.activity;
+package com.olgefilimonov.gifer.view;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,12 +12,12 @@ import butterknife.BindView;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.olgefilimonov.gifer.R;
 import com.olgefilimonov.gifer.adapter.SearchResultAdapter;
+import com.olgefilimonov.gifer.contract.SearchContract;
+import com.olgefilimonov.gifer.entity.Gif;
 import com.olgefilimonov.gifer.listener.EndlessRecyclerGridOnScrollListener;
-import com.olgefilimonov.gifer.model.Gif;
-import com.olgefilimonov.gifer.mvp.contract.SearchContract;
 import com.olgefilimonov.gifer.presenter.SearchPresenter;
 import com.olgefilimonov.gifer.rxjava.RxFloatingSearchView;
-import com.olgefilimonov.gifer.singleton.Constant;
+import com.olgefilimonov.gifer.singleton.AppConfig;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.val;
@@ -69,7 +69,7 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
       clearSearchResults();
       // Save query for the endless endlessListener
       query = charSequence.toString();
-      presenter.loadGifs(query, skip, Constant.SEARCH_LIMIT);
+      presenter.loadGifs(query, skip, AppConfig.SEARCH_LIMIT);
     }).subscribe();
   }
 
@@ -111,9 +111,9 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
    * @param current_page page, starts from 1
    */
   private void loadNextDataFromApi(int current_page) {
-    if (Constant.DEBUG) Log.d("Listener", "onLoadMore: " + current_page);
-    skip = (current_page - 1) * Constant.SEARCH_LIMIT;
-    presenter.loadGifs(query, skip, Constant.SEARCH_LIMIT);
+    if (AppConfig.DEBUG) Log.d("Listener", "onLoadMore: " + current_page);
+    skip = (current_page - 1) * AppConfig.SEARCH_LIMIT;
+    presenter.loadGifs(query, skip, AppConfig.SEARCH_LIMIT);
   }
 
   private void updateEmptyText() {

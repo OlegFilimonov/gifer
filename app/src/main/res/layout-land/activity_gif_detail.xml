@@ -45,6 +45,7 @@
         android:id="@+id/gif_score"
         android:layout_width="64dp"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:maxLines="1"
         android:textAlignment="center"
         android:textColor="@color/colorPrimary"

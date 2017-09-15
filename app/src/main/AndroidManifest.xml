@@ -3,7 +3,7 @@
     package="com.olgefilimonov.gifer">
 
   <application
-      android:name=".singleton.GiferApplication"
+      android:name=".singleton.App"
       android:allowBackup="true"
       android:icon="@mipmap/ic_launcher"
       android:label="@string/app_name"
@@ -11,10 +11,10 @@
       android:theme="@style/AppTheme.NoActionBar">
 
     <activity
-        android:name=".activity.GifDetailActivity"/>
+        android:name=".view.GifDetailActivity"/>
 
     <activity
-        android:name=".activity.SearchActivity"
+        android:name=".view.SearchActivity"
         android:screenOrientation="portrait">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>

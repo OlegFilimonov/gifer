@@ -1,4 +1,4 @@
-package com.olgefilimonov.gifer.mvp;
+package com.olgefilimonov.gifer.job;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -7,9 +7,9 @@ import android.util.Log;
 import com.birbit.android.jobqueue.Job;
 import com.birbit.android.jobqueue.Params;
 import com.birbit.android.jobqueue.RetryConstraint;
-import com.olgefilimonov.gifer.client.DefaultApi;
-import com.olgefilimonov.gifer.singleton.Constant;
-import com.olgefilimonov.gifer.singleton.GiferApplication;
+import com.olgefilimonov.gifer.api.RestApi;
+import com.olgefilimonov.gifer.singleton.App;
+import com.olgefilimonov.gifer.singleton.AppConfig;
 import javax.inject.Inject;
 
 /**
@@ -18,7 +18,7 @@ import javax.inject.Inject;
  * @author Oleg Filimonov
  */
 public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase.ResponseValue> extends Job {
-  @Inject protected DefaultApi defaultApi;
+  @Inject protected RestApi restApi;
   private UseCaseCallback<P> useCaseCallback;
   private Q requestValues;
   private Handler handler;
@@ -28,7 +28,7 @@ public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase
     this.requestValues = requestValues;
     this.useCaseCallback = useCaseCallback;
     this.handler = new Handler(Looper.getMainLooper());
-    GiferApplication.getInstance().getComponent().inject((UseCase<RequestValues, ResponseValue>) this);
+    App.getInstance().getComponent().inject((UseCase<RequestValues, ResponseValue>) this);
   }
 
   /**
@@ -37,7 +37,7 @@ public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase
    */
   protected void onSuccess(final P response) {
     if (isCancelled()) {
-      if (Constant.DEBUG) Log.d("USECASE", "onSuccess: cancelled");
+      if (AppConfig.DEBUG) Log.d("USECASE", "onSuccess: cancelled");
     } else {
       handler.post(() -> useCaseCallback.onSuccess(response));
     }

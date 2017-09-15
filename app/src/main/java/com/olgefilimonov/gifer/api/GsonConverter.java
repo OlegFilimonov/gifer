@@ -1,4 +1,4 @@
-package com.olgefilimonov.gifer.client;
+package com.olgefilimonov.gifer.api;
 
 import com.google.gson.Gson;
 import java.lang.annotation.Annotation;
@@ -12,23 +12,23 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * @author Oleg Filimonov
  */
-public class GsonCustomConverterFactory extends Converter.Factory {
+public class GsonConverter extends Converter.Factory {
   private final Gson gson;
   private final GsonConverterFactory gsonConverterFactory;
 
-  private GsonCustomConverterFactory(Gson gson) {
+  private GsonConverter(Gson gson) {
     if (gson == null) throw new NullPointerException("gson == null");
     this.gson = gson;
     this.gsonConverterFactory = GsonConverterFactory.create(gson);
   }
 
-  public static GsonCustomConverterFactory create(Gson gson) {
-    return new GsonCustomConverterFactory(gson);
+  public static GsonConverter create(Gson gson) {
+    return new GsonConverter(gson);
   }
 
   @Override public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
     if (type.equals(String.class)) {
-      return new GsonResponseBodyConverterToString<Object>(gson, type);
+      return new GsonResponseConverter<Object>(gson, type);
     } else {
       return gsonConverterFactory.responseBodyConverter(type, annotations, retrofit);
     }

@@ -1,4 +1,4 @@
-package com.olgefilimonov.gifer.activity;
+package com.olgefilimonov.gifer.view;
 
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
@@ -6,8 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import com.olgefilimonov.gifer.mvp.BasePresenter;
-import com.olgefilimonov.gifer.mvp.BaseView;
+import com.olgefilimonov.gifer.presenter.BasePresenter;
 import icepick.Icepick;
 
 /**

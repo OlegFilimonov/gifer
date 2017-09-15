@@ -3,15 +3,15 @@ package com.olgefilimonov.gifer.presenter;
 import com.birbit.android.jobqueue.JobManager;
 import com.birbit.android.jobqueue.Params;
 import com.birbit.android.jobqueue.TagConstraint;
-import com.olgefilimonov.gifer.model.Gif;
-import com.olgefilimonov.gifer.model.RatedGif;
-import com.olgefilimonov.gifer.mvp.UseCase;
-import com.olgefilimonov.gifer.mvp.contract.SearchContract;
-import com.olgefilimonov.gifer.singleton.Constant;
-import com.olgefilimonov.gifer.singleton.GiferApplication;
-import com.olgefilimonov.gifer.usecase.CheckGifRatingJob;
-import com.olgefilimonov.gifer.usecase.LoadGifsJob;
-import com.olgefilimonov.gifer.usecase.RateGifJob;
+import com.olgefilimonov.gifer.contract.SearchContract;
+import com.olgefilimonov.gifer.entity.Gif;
+import com.olgefilimonov.gifer.entity.RatedGif;
+import com.olgefilimonov.gifer.job.CheckGifRatingJob;
+import com.olgefilimonov.gifer.job.LoadGifsJob;
+import com.olgefilimonov.gifer.job.RateGifJob;
+import com.olgefilimonov.gifer.job.UseCase;
+import com.olgefilimonov.gifer.singleton.App;
+import com.olgefilimonov.gifer.singleton.AppConfig;
 import io.objectbox.BoxStore;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class SearchPresenter implements SearchContract.Presenter {
 
   public SearchPresenter(SearchContract.View view) {
     this.view = view;
-    GiferApplication.getInstance().getComponent().inject(this);
+    App.getInstance().getComponent().inject(this);
   }
 
   @Override public void loadGifs(String query, final int skip, int limit) {
@@ -74,10 +74,10 @@ public class SearchPresenter implements SearchContract.Presenter {
     };
 
     val requestValues = new LoadGifsJob.RequestValues(query, skip, limit);
-    val params = new Params(Constant.DEFAULT_PRIORITY).addTags(presenterTag, loadGifsTag);
+    val params = new Params(AppConfig.DEFAULT_PRIORITY).addTags(presenterTag, loadGifsTag);
     val gifsBox = boxStore.boxFor(RatedGif.class);
 
-    val job = new LoadGifsJob(requestValues, Constant.GIPHER_API_KEY, gifsBox, callback, params);
+    val job = new LoadGifsJob(requestValues, AppConfig.GIPHER_API_KEY, gifsBox, callback, params);
 
     jobManager.addJobInBackground(job);
   }
@@ -92,7 +92,7 @@ public class SearchPresenter implements SearchContract.Presenter {
       @Override public void onError() {
         view.showError();
       }
-    }, new Params(Constant.DEFAULT_PRIORITY).addTags(presenterTag));
+    }, new Params(AppConfig.DEFAULT_PRIORITY).addTags(presenterTag));
     jobManager.addJobInBackground(job);
   }
 
@@ -107,7 +107,7 @@ public class SearchPresenter implements SearchContract.Presenter {
         view.showError();
       }
     };
-    RateGifJob job = new RateGifJob(requestValues, boxStore.boxFor(RatedGif.class), useCaseCallback, new Params(Constant.DEFAULT_PRIORITY).addTags(presenterTag));
+    RateGifJob job = new RateGifJob(requestValues, boxStore.boxFor(RatedGif.class), useCaseCallback, new Params(AppConfig.DEFAULT_PRIORITY).addTags(presenterTag));
     jobManager.addJobInBackground(job);
   }
 }
