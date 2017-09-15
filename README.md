@@ -1,8 +1,6 @@
 # Gifer
 An Android app made to provide an example of my code style. This repo is mainly intended for people looking to hire me as Android Developer.
 
-![demo](./out.webp)
-
 # Architecture
 
 Architecture is based on Clean pattern. Inspired by [Android Architecture Blueprints](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/). 
