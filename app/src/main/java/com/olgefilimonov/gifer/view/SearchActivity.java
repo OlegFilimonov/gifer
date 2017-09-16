@@ -13,13 +13,15 @@ import com.arlib.floatingsearchview.FloatingSearchView;
 import com.olgefilimonov.gifer.R;
 import com.olgefilimonov.gifer.adapter.SearchResultAdapter;
 import com.olgefilimonov.gifer.contract.SearchContract;
-import com.olgefilimonov.gifer.entity.Gif;
+import com.olgefilimonov.gifer.entity.GifEntity;
 import com.olgefilimonov.gifer.listener.EndlessRecyclerGridOnScrollListener;
 import com.olgefilimonov.gifer.presenter.SearchPresenter;
 import com.olgefilimonov.gifer.rxjava.RxFloatingSearchView;
 import com.olgefilimonov.gifer.singleton.AppConfig;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.val;
 
 import static com.olgefilimonov.gifer.singleton.Utils.hideKeyboard;
@@ -34,7 +36,7 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
   @BindView(R.id.empty_text_view) TextView emptyTextView;
   @BindView(R.id.recycler_view) RecyclerView searchResultsRecyclerView;
 
-  private List<Gif> gifs = new ArrayList<>();
+  private List<GifEntity> gifEntities = new ArrayList<>();
   private String query;
   private int skip = 0;
   private SearchResultAdapter adapter;
@@ -65,7 +67,7 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
   }
 
   private void setupSearch() {
-    RxFloatingSearchView.queryChanges(floatingSearchView).doOnNext(charSequence -> {
+    RxFloatingSearchView.queryChanges(floatingSearchView).debounce(400, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).doOnNext(charSequence -> {
       clearSearchResults();
       // Save query for the endless endlessListener
       query = charSequence.toString();
@@ -81,16 +83,16 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
         loadNextDataFromApi(current_page);
       }
     };
-    adapter = new SearchResultAdapter(gifs, this, new SearchResultAdapter.SearchAdapterListener() {
-      @Override public void onItemRated(Gif gif, int rating) {
-        presenter.rateGif(gif.getGifId(), rating);
+    adapter = new SearchResultAdapter(gifEntities, this, new SearchResultAdapter.SearchAdapterListener() {
+      @Override public void onItemRated(GifEntity gifEntity, int rating) {
+        presenter.rateGif(gifEntity.getGifId(), rating);
       }
 
-      @Override public void onItemClick(Gif gif) {
+      @Override public void onItemClick(GifEntity gifEntity) {
         hideKeyboard(SearchActivity.this, searchResultsRecyclerView);
-        // Save gif id to update it later
-        clickedGifId = gif.getGifId();
-        GifDetailActivity.start(SearchActivity.this, gif.getVideoUrl(), gif.getGifId());
+        // Save gifEntity id to update it later
+        clickedGifId = gifEntity.getGifId();
+        GifDetailActivity.start(SearchActivity.this, gifEntity.getVideoUrl(), gifEntity.getGifId());
       }
     });
     searchResultsRecyclerView.setLayoutManager(layoutManager);
@@ -118,7 +120,7 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
 
   private void updateEmptyText() {
     // Update empty text drawable
-    boolean empty = gifs.isEmpty();
+    boolean empty = gifEntities.isEmpty();
     if (empty) {
       emptyTextView.setVisibility(View.VISIBLE);
       // If text is empty show an empty string. Otherwise show "no results"
@@ -136,21 +138,21 @@ public class SearchActivity extends BaseActivity<SearchContract.Presenter> imple
   @Override public void clearSearchResults() {
     skip = 0;
     adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
-    gifs.clear();
+    gifEntities.clear();
     endlessListener.reset();
   }
 
-  @Override public void showSearchResults(final List<Gif> newGifs) {
-    gifs.addAll(newGifs);
+  @Override public void showSearchResults(final List<GifEntity> newGifEntities) {
+    gifEntities.addAll(newGifEntities);
     updateEmptyText();
-    adapter.notifyItemRangeInserted(adapter.getItemCount() - 1, newGifs.size());
+    adapter.notifyItemRangeInserted(adapter.getItemCount() - 1, newGifEntities.size());
   }
 
   @Override public void showGifRating(final String gifId, final int newRating) {
     //adapter.updateGifRating(gifId, newRating);
 
-    for (int i = 0; i < gifs.size(); i++) {
-      val gif = gifs.get(i);
+    for (int i = 0; i < gifEntities.size(); i++) {
+      val gif = gifEntities.get(i);
       if (gif.getGifId().equals(gifId)) {
         gif.setScore(newRating);
         ((SearchResultAdapter.SearchResultViewHolder) searchResultsRecyclerView.findViewHolderForAdapterPosition(i)).updateRating(newRating);

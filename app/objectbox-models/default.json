@@ -4,32 +4,33 @@
   "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
   "entities": [
     {
-      "id": "3:6045680803350688681",
-      "lastPropertyId": "3:3741417358671090478",
-      "name": "RatedGif",
+      "id": "4:501800603488485272",
+      "lastPropertyId": "3:6960985794216035182",
+      "name": "RatedGifEntity",
       "properties": [
         {
-          "id": "1:6398723469753747549",
+          "id": "1:102668248224936952",
           "name": "id"
         },
         {
-          "id": "2:3494760236141722054",
+          "id": "2:6530841439709302333",
           "name": "gifId"
         },
         {
-          "id": "3:3741417358671090478",
+          "id": "3:6960985794216035182",
           "name": "score"
         }
       ]
     }
   ],
-  "lastEntityId": "3:6045680803350688681",
+  "lastEntityId": "4:501800603488485272",
   "lastIndexId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 2,
   "retiredEntityUids": [
     879225103788421323,
-    6448689158891027505
+    6448689158891027505,
+    6045680803350688681
   ],
   "retiredIndexUids": [],
   "retiredPropertyUids": [
@@ -39,7 +40,10 @@
     2904623207034951292,
     1122853071508568607,
     7162800820041307588,
-    5606263229672610035
+    5606263229672610035,
+    6398723469753747549,
+    3494760236141722054,
+    3741417358671090478
   ],
   "version": 1
 }

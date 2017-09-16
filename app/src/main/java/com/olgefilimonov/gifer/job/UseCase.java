@@ -1,58 +1,43 @@
 package com.olgefilimonov.gifer.job;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.support.annotation.Nullable;
 import com.birbit.android.jobqueue.Job;
 import com.birbit.android.jobqueue.Params;
 import com.birbit.android.jobqueue.RetryConstraint;
-import com.olgefilimonov.gifer.api.RestApi;
-import com.olgefilimonov.gifer.singleton.App;
-import com.olgefilimonov.gifer.singleton.AppConfig;
-import javax.inject.Inject;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableObserver;
+import timber.log.Timber;
 
 /**
  * Use cases are the entry points to the domain layer.
  *
  * @author Oleg Filimonov
  */
-public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase.ResponseValue> extends Job {
-  @Inject protected RestApi restApi;
-  private UseCaseCallback<P> useCaseCallback;
-  private Q requestValues;
-  private Handler handler;
+public abstract class UseCase<Q extends UseCase.Request, P> extends Job {
 
-  protected UseCase(Q requestValues, UseCaseCallback<P> useCaseCallback, Params params) {
+  Q request;
+  private DisposableObserver<P> observer;
+
+  UseCase(Q request, DisposableObserver<P> observer, Params params) {
     super(params);
-    this.requestValues = requestValues;
-    this.useCaseCallback = useCaseCallback;
-    this.handler = new Handler(Looper.getMainLooper());
-    App.getInstance().getComponent().inject((UseCase<RequestValues, ResponseValue>) this);
-  }
-
-  /**
-   * Executed when usecase has completed successfully or if job was cancelled in the progress
-   * This replaces thread pool scheduler to execute callbacks on the main thread
-   */
-  protected void onSuccess(final P response) {
-    if (isCancelled()) {
-      if (AppConfig.DEBUG) Log.d("USECASE", "onSuccess: cancelled");
-    } else {
-      handler.post(() -> useCaseCallback.onSuccess(response));
-    }
-  }
-
-  protected void onError() {
-    handler.post(() -> useCaseCallback.onError());
+    this.request = request;
+    this.observer = observer;
   }
 
   @Override public void onRun() throws Throwable {
-    executeUseCase(requestValues);
+    buildObservable(request).observeOn(AndroidSchedulers.mainThread()).subscribeWith(observer);
+  }
+
+  protected abstract Observable<P> buildObservable(Q requestValues);
+
+  @Override protected void onCancel(int cancelReason, @Nullable Throwable throwable) {
+    Timber.d("Job %s cancelled", getClass().getSimpleName());
   }
 
   @Override public void onAdded() {
-
+    Timber.d("Job %s added", getClass().getSimpleName());
   }
 
   @Override protected RetryConstraint shouldReRunOnThrowable(@NonNull Throwable throwable, int runCount, int maxRunCount) {
@@ -63,23 +48,9 @@ public abstract class UseCase<Q extends UseCase.RequestValues, P extends UseCase
     return RetryConstraint.CANCEL;
   }
 
-  protected abstract void executeUseCase(Q requestValues) throws Throwable;
-
-  /**
-   * Data passed to a request.
-   */
-  public interface RequestValues {
+  interface Request {
   }
 
-  /**
-   * Data received from a request.
-   */
-  public interface ResponseValue {
-  }
-
-  public interface UseCaseCallback<R> {
-    void onSuccess(R response);
-
-    void onError();
+  interface Response {
   }
 }

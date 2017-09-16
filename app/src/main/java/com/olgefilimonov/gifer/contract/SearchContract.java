@@ -1,6 +1,6 @@
 package com.olgefilimonov.gifer.contract;
 
-import com.olgefilimonov.gifer.entity.Gif;
+import com.olgefilimonov.gifer.entity.GifEntity;
 import com.olgefilimonov.gifer.presenter.BasePresenter;
 import com.olgefilimonov.gifer.view.BaseView;
 import java.util.List;
@@ -37,9 +37,9 @@ public class SearchContract {
     /**
      * Adds search results to the bottom of the list
      *
-     * @param gifs search results to add
+     * @param gifEntities search results to add
      */
-    void showSearchResults(List<Gif> gifs);
+    void showSearchResults(List<GifEntity> gifEntities);
 
     /**
      * Updates rating of the search result in the list, if present

@@ -3,9 +3,14 @@ package com.olgefilimonov.gifer.dagger;
 import android.content.Context;
 import com.birbit.android.jobqueue.JobManager;
 import com.birbit.android.jobqueue.config.Configuration;
+import com.olgefilimonov.gifer.api.RestApi;
 import com.olgefilimonov.gifer.entity.MyObjectBox;
+import com.olgefilimonov.gifer.entity.RatedGifEntity;
+import com.olgefilimonov.gifer.reporitory.GifRepository;
+import com.olgefilimonov.gifer.reporitory.GifRepositoryImpl;
 import dagger.Module;
 import dagger.Provides;
+import io.objectbox.Box;
 import io.objectbox.BoxStore;
 import javax.inject.Singleton;
 
@@ -34,5 +39,13 @@ import javax.inject.Singleton;
         .consumerKeepAlive(120);//wait 2 minute
 
     return new JobManager(builder.build());
+  }
+
+  @Provides @Singleton Box<RatedGifEntity> provideGifsBox(BoxStore boxStore) {
+    return boxStore.boxFor(RatedGifEntity.class);
+  }
+
+  @Provides @Singleton GifRepository provideGifRepository(Box<RatedGifEntity> gifsBox, RestApi restApi) {
+    return new GifRepositoryImpl(gifsBox, restApi);
   }
 }

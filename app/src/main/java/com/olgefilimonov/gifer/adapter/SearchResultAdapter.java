@@ -12,7 +12,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.koushikdutta.ion.Ion;
 import com.olgefilimonov.gifer.R;
-import com.olgefilimonov.gifer.entity.Gif;
+import com.olgefilimonov.gifer.entity.GifEntity;
 import java.util.List;
 import lombok.val;
 
@@ -21,12 +21,12 @@ import lombok.val;
  */
 
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder> {
-  private List<Gif> gifs;
+  private List<GifEntity> gifEntities;
   private Activity activity;
   private SearchAdapterListener searchAdapterListener;
 
-  public SearchResultAdapter(List<Gif> gifs, Activity activity, SearchAdapterListener searchAdapterListener) {
-    this.gifs = gifs;
+  public SearchResultAdapter(List<GifEntity> gifEntities, Activity activity, SearchAdapterListener searchAdapterListener) {
+    this.gifEntities = gifEntities;
     this.activity = activity;
     this.searchAdapterListener = searchAdapterListener;
   }
@@ -37,7 +37,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
   }
 
   @Override public void onBindViewHolder(final SearchResultViewHolder holder, int position) {
-    val gif = gifs.get(position);
+    val gif = gifEntities.get(position);
 
     // Load preview image
     Ion.with(activity).load(gif.getPreviewUrl()).intoImageView(holder.image);
@@ -50,13 +50,13 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
   }
 
   @Override public int getItemCount() {
-    return gifs.size();
+    return gifEntities.size();
   }
 
   public interface SearchAdapterListener {
-    void onItemRated(Gif gif, int rating);
+    void onItemRated(GifEntity gifEntity, int rating);
 
-    void onItemClick(Gif gif);
+    void onItemClick(GifEntity gifEntity);
   }
 
   public class SearchResultViewHolder extends RecyclerView.ViewHolder {

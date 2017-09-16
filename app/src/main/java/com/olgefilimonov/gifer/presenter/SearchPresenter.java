@@ -4,15 +4,14 @@ import com.birbit.android.jobqueue.JobManager;
 import com.birbit.android.jobqueue.Params;
 import com.birbit.android.jobqueue.TagConstraint;
 import com.olgefilimonov.gifer.contract.SearchContract;
-import com.olgefilimonov.gifer.entity.Gif;
-import com.olgefilimonov.gifer.entity.RatedGif;
+import com.olgefilimonov.gifer.entity.GifEntity;
 import com.olgefilimonov.gifer.job.CheckGifRatingJob;
+import com.olgefilimonov.gifer.job.DefaultObserver;
 import com.olgefilimonov.gifer.job.LoadGifsJob;
 import com.olgefilimonov.gifer.job.RateGifJob;
-import com.olgefilimonov.gifer.job.UseCase;
 import com.olgefilimonov.gifer.singleton.App;
 import com.olgefilimonov.gifer.singleton.AppConfig;
-import io.objectbox.BoxStore;
+import io.reactivex.annotations.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -29,7 +28,6 @@ public class SearchPresenter implements SearchContract.Presenter {
    */
   private final String presenterTag = UUID.randomUUID().toString();
   @Inject JobManager jobManager;
-  @Inject BoxStore boxStore;
   private SearchContract.View view;
   private long lastCallbackTimestamp;
 
@@ -43,17 +41,23 @@ public class SearchPresenter implements SearchContract.Presenter {
 
     if (query.trim().equals("")) {
       view.hideProgress();
-      view.showSearchResults(new ArrayList<Gif>());
+      view.showSearchResults(new ArrayList<GifEntity>());
       lastCallbackTimestamp = System.currentTimeMillis();
       return;
     }
 
     // Cancel all previous jobs
     String loadGifsTag = "load_gifs";
+
     jobManager.cancelJobsInBackground(null, TagConstraint.ALL, loadGifsTag);
 
-    val callback = new UseCase.UseCaseCallback<LoadGifsJob.ResponseValue>() {
-      @Override public void onSuccess(LoadGifsJob.ResponseValue response) {
+    val observer = new DefaultObserver<LoadGifsJob.Response>() {
+      @Override public void onError(@NonNull Throwable e) {
+        view.hideProgress();
+        view.showError();
+      }
+
+      @Override public void onNext(LoadGifsJob.Response response) {
         view.hideProgress();
 
         if (response.getAddedTimestamp() < lastCallbackTimestamp) {
@@ -63,51 +67,53 @@ public class SearchPresenter implements SearchContract.Presenter {
         lastCallbackTimestamp = response.getAddedTimestamp();
         // Reset search results if we're on the first page
         if (skip == 0) view.clearSearchResults();
-        List<Gif> gifs = response.getGifs();
-        view.showSearchResults(gifs);
-      }
-
-      @Override public void onError() {
-        view.hideProgress();
-        view.showError();
+        List<GifEntity> gifEntities = response.getGifEntities();
+        view.showSearchResults(gifEntities);
       }
     };
-
-    val requestValues = new LoadGifsJob.RequestValues(query, skip, limit);
+    val requestValues = new LoadGifsJob.Request(query, skip, limit);
     val params = new Params(AppConfig.DEFAULT_PRIORITY).addTags(presenterTag, loadGifsTag);
-    val gifsBox = boxStore.boxFor(RatedGif.class);
 
-    val job = new LoadGifsJob(requestValues, AppConfig.GIPHER_API_KEY, gifsBox, callback, params);
+    val job = new LoadGifsJob(requestValues, observer, params);
 
     jobManager.addJobInBackground(job);
   }
 
   @Override public void updateGifRating(String gifId) {
-    val requestValues = new CheckGifRatingJob.RequestValues(gifId);
-    val job = new CheckGifRatingJob(requestValues, boxStore.boxFor(RatedGif.class), new UseCase.UseCaseCallback<CheckGifRatingJob.ResponseValues>() {
-      @Override public void onSuccess(CheckGifRatingJob.ResponseValues response) {
+
+    val observer = new DefaultObserver<CheckGifRatingJob.Response>() {
+      @Override public void onNext(CheckGifRatingJob.Response response) {
         view.showGifRating(response.getGifId(), response.getNewRating());
       }
 
-      @Override public void onError() {
+      @Override public void onError(Throwable exception) {
         view.showError();
       }
-    }, new Params(AppConfig.DEFAULT_PRIORITY).addTags(presenterTag));
+    };
+    val requestValues = new CheckGifRatingJob.Request(gifId);
+    val params = new Params(AppConfig.DEFAULT_PRIORITY).addTags(presenterTag);
+
+    val job = new CheckGifRatingJob(requestValues, observer, params);
+
     jobManager.addJobInBackground(job);
   }
 
   @Override public void rateGif(String gifId, int rating) {
-    RateGifJob.RequestValues requestValues = new RateGifJob.RequestValues(gifId, rating);
-    UseCase.UseCaseCallback<RateGifJob.ResponseValues> useCaseCallback = new UseCase.UseCaseCallback<RateGifJob.ResponseValues>() {
-      @Override public void onSuccess(RateGifJob.ResponseValues response) {
+
+    val observer = new DefaultObserver<RateGifJob.Response>() {
+      @Override public void onNext(RateGifJob.Response response) {
         view.showGifRating(response.getGifId(), response.getNewRating());
       }
 
-      @Override public void onError() {
+      @Override public void onError(Throwable exception) {
         view.showError();
       }
     };
-    RateGifJob job = new RateGifJob(requestValues, boxStore.boxFor(RatedGif.class), useCaseCallback, new Params(AppConfig.DEFAULT_PRIORITY).addTags(presenterTag));
+    val requestValues = new RateGifJob.Request(gifId, rating);
+    val params = new Params(AppConfig.DEFAULT_PRIORITY).addTags(presenterTag);
+
+    val job = new RateGifJob(requestValues, observer, params);
+
     jobManager.addJobInBackground(job);
   }
 }

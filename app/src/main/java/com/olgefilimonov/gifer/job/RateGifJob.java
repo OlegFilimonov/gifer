@@ -1,59 +1,41 @@
 package com.olgefilimonov.gifer.job;
 
-import android.support.annotation.Nullable;
 import com.birbit.android.jobqueue.Params;
-import com.olgefilimonov.gifer.entity.RatedGif;
-import io.objectbox.Box;
+import com.olgefilimonov.gifer.reporitory.GifRepository;
+import com.olgefilimonov.gifer.singleton.App;
+import io.reactivex.Observable;
+import io.reactivex.observers.DisposableObserver;
+import javax.inject.Inject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.val;
 
 /**
  * @author Oleg Filimonov
  */
 
-public class RateGifJob extends UseCase<RateGifJob.RequestValues, RateGifJob.ResponseValues> {
-  private final Box<RatedGif> gifsBox;
+public class RateGifJob extends UseCase<RateGifJob.Request, RateGifJob.Response> {
+  @Inject GifRepository gifRepository;
 
-  public RateGifJob(RequestValues requestValues, Box<RatedGif> gifsBox, UseCaseCallback<ResponseValues> useCaseCallback, Params params) {
-    super(requestValues, useCaseCallback, params);
-    this.gifsBox = gifsBox;
+  public RateGifJob(Request request, DisposableObserver<Response> observer, Params params) {
+    super(request, observer, params);
+    App.getInstance().getComponent().inject(this);
   }
 
-  @Override protected void executeUseCase(RequestValues requestValues) throws Throwable {
-
-    val gifId = requestValues.getGifId();
-    val ratedGifList = gifsBox.find("gifId", gifId);
-
-    RatedGif ratedGif;
-    if (ratedGifList.size() == 0) {
-      // No rating found
-      ratedGif = new RatedGif();
-      ratedGif.setGifId(gifId);
-    } else if (ratedGifList.size() == 1) {
-      // Rating found
-      ratedGif = ratedGifList.get(0);
-    } else {
-      throw new RuntimeException("Database error. gifId must be unique");
-    }
-
-    ratedGif.setScore(ratedGif.getScore() + requestValues.getRating());
-    gifsBox.put(ratedGif);
-
-    onSuccess(new ResponseValues(ratedGif.getGifId(), ratedGif.getScore()));
+  @Override protected Observable<Response> buildObservable(Request requestValues) {
+    return gifRepository.rateGif(requestValues.getGifId(), requestValues.getRating()).map(this::convertToResponse);
   }
 
-  @Override protected void onCancel(int cancelReason, @Nullable Throwable throwable) {
-    onError();
+  private Response convertToResponse(Integer newRating) {
+    return new Response(request.getGifId(), newRating);
   }
 
-  @Getter @Setter @AllArgsConstructor public static final class RequestValues implements UseCase.RequestValues {
+  @Getter @Setter @AllArgsConstructor public static final class Request implements UseCase.Request {
     private String gifId;
     private int rating;
   }
 
-  @Getter @Setter @AllArgsConstructor public static final class ResponseValues implements UseCase.ResponseValue {
+  @Getter @Setter @AllArgsConstructor public static final class Response implements UseCase.Response {
     private String gifId;
     private int newRating;
   }
