@@ -16,8 +16,8 @@ import lombok.val;
  */
 
 public class GifRepositoryImpl implements GifRepository {
-  @Inject Box<RatedGifEntity> gifsBox;
-  @Inject RestApi restApi;
+  private Box<RatedGifEntity> gifsBox;
+  private RestApi restApi;
 
   @Inject public GifRepositoryImpl(Box<RatedGifEntity> gifsBox, RestApi restApi) {
     this.gifsBox = gifsBox;
