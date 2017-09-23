@@ -5,7 +5,7 @@ This is an android app app made solly to provide an example of my code style. Th
 
 The app has a search bar that queries [Giphy API](https://developers.giphy.com/docs/) and shows previews of gifs. You can click on the items to watch the full video of the gif. You can also rate the items which will be stored locally.
 
-![out.webp](./out.webp)
+![out.webp](out.webp)
 
 # Architecture
 
