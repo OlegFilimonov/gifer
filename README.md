@@ -1,9 +1,15 @@
 # Gifer
-An Android app made to provide an example of my code style. This repo is mainly intended for people looking to hire me as Android Developer.
+This is an android app app made solly to provide an example of my code style. This repo is mainly intended for people looking to hire me as Android Developer.
+
+# Premise
+
+The app has a search bar that queries [Giphy API](https://developers.giphy.com/docs/) and shows previews of gifs. You can click on the items to watch the full video of the gif. You can also rate the items which will be stored locally.
+
+![out.webp](out.webp)
 
 # Architecture
 
-Architecture is based on Clean pattern. Inspired by [Android Architecture Blueprints](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/). 
+Architecture is based on Clean pattern. Inspired by [Android Architecture Blueprints](https://github.com/googlesamples/android-architecture/tree/todo-mvp-clean/).
 
 # Libraries
 
