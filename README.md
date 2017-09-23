@@ -19,9 +19,3 @@ Libraries used in this project:
  - [Dagger 2](https://google.github.io/dagger/)
  - [ObjectBox](https://github.com/greenrobot/ObjectBox)
  - [Android Priority JobQueue](https://github.com/yigit/android-priority-jobqueue)
-
-Other libraries I use that weren't utilized in this project:
-
- - [Calligraphy](https://github.com/chrisjenx/Calligraphy)
- - [Dexter](https://github.com/Karumi/Dexter)
- - [LeakCanary](https://github.com/square/leakcanary)
